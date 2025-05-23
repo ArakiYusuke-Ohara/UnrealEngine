@@ -2,6 +2,8 @@
 
 
 #include "Magician.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 // Sets default values
 AMagician::AMagician()
@@ -16,6 +18,19 @@ void AMagician::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// インプットマップを設定
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (PlayerController)
+	{
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		if (Subsystem)
+		{
+			Subsystem->AddMappingContext(m_InputMap, 0);
+		}
+	}
+
+	bUseControllerRotationYaw = false;
+
 }
 
 // Called every frame
@@ -30,5 +45,42 @@ void AMagician::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// 入力アクションを設定
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+
+		// ジャンプ
+		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+		// 移動
+		EnhancedInputComponent->BindAction(m_MoveAction, ETriggerEvent::Triggered, this, &AMagician::InputMove);
+
+		// 弾丸発射
+		EnhancedInputComponent->BindAction(m_FireBulletAction, ETriggerEvent::Started, this, &AMagician::InputAttack);
+	}
+
 }
 
+/// <summary>
+/// 入力移動処理
+/// </summary>
+/// <param name="value">入力値(FVector2D)</param>
+void AMagician::InputMove(const FInputActionValue& value)
+{
+	// アナログスティックの入力を取得
+	FVector2D inputVec = value.Get<FVector2D>();
+
+	// アナログスティックの座標系をUEの3D座標系に変換
+	FVector moveVec(inputVec.Y, inputVec.X, 0.0f);
+
+	// 移動
+	AddMovementInput(moveVec, m_MoveSpeed);
+}
+
+/// <summary>
+/// 攻撃
+/// </summary>
+/// <param name="value">入力値(bool)</param>
+void AMagician::InputAttack(const FInputActionValue& value)
+{
+}
