@@ -7,7 +7,10 @@
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
+#include "../Bullet/MagicianBullet.h"
 #include "Magician.generated.h"
+
+class AMagicianBullet;
 
 UCLASS()
 class PROJECT_API AMagician : public ACharacter
@@ -35,6 +38,9 @@ public:
 	// çUåÇ
 	void InputAttack(const FInputActionValue& value);
 
+	// î≠éÀ
+	void FireBullet();
+
 private:
 
 	UPROPERTY(EditAnywhere)
@@ -52,4 +58,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float m_MoveSpeed;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMagicianBullet> m_Bullet;
 };

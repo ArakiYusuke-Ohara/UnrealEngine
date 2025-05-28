@@ -4,6 +4,8 @@
 #include "Magician.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "../Bullet/BulletManager.h"
+#include "../GameInstance/MyGameInstance.h"
 
 // Sets default values
 AMagician::AMagician()
@@ -83,4 +85,18 @@ void AMagician::InputMove(const FInputActionValue& value)
 /// <param name="value">“ü—Í’l(bool)</param>
 void AMagician::InputAttack(const FInputActionValue& value)
 {
+	FireBullet();
+}
+
+void AMagician::FireBullet()
+{
+	if (m_Bullet)
+	{
+		UMyGameInstance* gameInstance = Cast<UMyGameInstance>(GetGameInstance());
+		UBulletManager* bulletManager = gameInstance->GetBulletManager();
+		if (bulletManager)
+		{
+			bulletManager->FireBullet(m_Bullet, GetActorLocation(), GetActorRotation());
+		}
+	}
 }
