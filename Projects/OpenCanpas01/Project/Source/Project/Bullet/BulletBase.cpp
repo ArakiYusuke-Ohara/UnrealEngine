@@ -25,7 +25,7 @@ void ABulletBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (m_NowLife <= 0.0f)
+	if (m_NowLife <= 0.0f && m_Active)
 	{
 		Disable();
 	}
@@ -36,7 +36,6 @@ void ABulletBase::Fire(FVector pos, FRotator rot)
 {
 	m_Active = true; 
 	m_NowLife = m_Life;
-	PrimaryActorTick.bCanEverTick = true;
 	SetActorLocation(pos);
 	SetActorRotation(rot);
 	SetActorHiddenInGame(false);
@@ -46,7 +45,6 @@ void ABulletBase::Fire(FVector pos, FRotator rot)
 void ABulletBase::Disable()
 {
 	m_Active = false;
-	PrimaryActorTick.bCanEverTick = false;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 }

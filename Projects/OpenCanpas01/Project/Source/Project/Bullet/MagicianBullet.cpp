@@ -2,15 +2,15 @@
 
 
 #include "MagicianBullet.h"
-#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 void AMagicianBullet::BeginPlay()
 {
 	Super::BeginPlay();
 
+	m_Mesh = FindComponentByClass<UStaticMeshComponent>();
 	m_Movement = FindComponentByClass<UProjectileMovementComponent>();
-	m_Niagara = FindComponentByClass<UNiagaraComponent>();
 }
 
 void AMagicianBullet::Fire(FVector pos, FRotator rot)
@@ -23,9 +23,9 @@ void AMagicianBullet::Fire(FVector pos, FRotator rot)
 		float Speed = m_Movement->InitialSpeed;
 		m_Movement->Velocity = ForwardDir * Speed;
 	}
-	if (m_Niagara)
+	if (m_Particle && m_Mesh)
 	{
-		m_Niagara->Activate();
+		m_ParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(m_Particle, m_Mesh, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTargetIncludingScale, true);
 	}
 }
 
@@ -33,8 +33,13 @@ void AMagicianBullet::Disable()
 {
 	ABulletBase::Disable();
 
-	if (m_Niagara)
+	if (m_ParticleComponent)
 	{
-		m_Niagara->DeactivateImmediate();
+		m_ParticleComponent->DestroyComponent();
+		m_ParticleComponent = nullptr;
+	}
+	if (m_EndEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_EndEffect, GetActorLocation());
 	}
 }

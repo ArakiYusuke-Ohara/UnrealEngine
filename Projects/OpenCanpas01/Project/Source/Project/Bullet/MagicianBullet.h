@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "BulletBase.h"
+#include "NiagaraComponent.h"
 #include "MagicianBullet.generated.h"
 
 class UProjectileMovementComponent;
-class UNiagaraComponent;
 
 /**
  * 
@@ -26,6 +26,14 @@ public:
 	virtual void Disable() override;
 
 private:
+	UStaticMeshComponent* m_Mesh;
 	UProjectileMovementComponent* m_Movement;
-	UNiagaraComponent* m_Niagara;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* m_Particle;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* m_EndEffect;
+
+	UNiagaraComponent* m_ParticleComponent;
 };
