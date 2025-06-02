@@ -25,6 +25,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
+	UFUNCTION(BlueprintPure, Category = "Attack")
+	bool IsAttacking() const { return m_IsAttack; }
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -38,8 +42,15 @@ public:
 	// çUåÇ
 	void InputAttack(const FInputActionValue& value);
 
+	// ÉWÉÉÉìÉv
+	void InputJump(const FInputActionValue& value);
+
 	// î≠éÀ
 	void FireBullet();
+
+	// çUåÇèIóπ
+	void EndAttack();
+
 
 private:
 
@@ -60,4 +71,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AMagicianBullet> m_Bullet;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* m_AttackMontage;
+
+	bool m_IsAttack;
 };

@@ -13,6 +13,9 @@ AMagician::AMagician()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	m_Bullet = nullptr;
+	m_IsAttack = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -32,7 +35,7 @@ void AMagician::BeginPlay()
 	}
 
 	bUseControllerRotationYaw = false;
-
+	m_IsAttack = false;
 }
 
 // Called every frame
@@ -51,7 +54,7 @@ void AMagician::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
 		// ジャンプ
-		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Started, this, &AMagician::InputJump);
 		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// 移動
@@ -69,6 +72,9 @@ void AMagician::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 /// <param name="value">入力値(FVector2D)</param>
 void AMagician::InputMove(const FInputActionValue& value)
 {
+	// 攻撃中は動かない
+	if (m_IsAttack) return;
+
 	// アナログスティックの入力を取得
 	FVector2D inputVec = value.Get<FVector2D>();
 
@@ -85,7 +91,28 @@ void AMagician::InputMove(const FInputActionValue& value)
 /// <param name="value">入力値(bool)</param>
 void AMagician::InputAttack(const FInputActionValue& value)
 {
-	FireBullet();
+	// 攻撃モンタージュを再生する
+	// 弾の発射はモンタージュから通知される
+	if (m_AttackMontage && GetMesh())
+	{
+		UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+		if (animInstance && !m_IsAttack)
+		{
+			m_IsAttack = true;
+			animInstance->Montage_Play(m_AttackMontage);
+		}
+	}
+}
+
+/// <summary>
+/// ジャンプ
+/// </summary>
+/// <param name="value">入力値(bool)</param>
+void AMagician::InputJump(const FInputActionValue& value)
+{
+	if (m_IsAttack) return;
+
+	Jump();
 }
 
 void AMagician::FireBullet()
@@ -99,4 +126,9 @@ void AMagician::FireBullet()
 			bulletManager->FireBullet(m_Bullet, GetActorLocation(), GetActorRotation());
 		}
 	}
+}
+
+void AMagician::EndAttack()
+{
+	m_IsAttack = false;
 }
