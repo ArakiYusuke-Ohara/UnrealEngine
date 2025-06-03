@@ -42,7 +42,6 @@ void AMagician::BeginPlay()
 void AMagician::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -72,14 +71,15 @@ void AMagician::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 /// <param name="value">入力値(FVector2D)</param>
 void AMagician::InputMove(const FInputActionValue& value)
 {
+	// アナログスティックの入力を取得
+	m_InputVec = value.Get<FVector2D>();
+
 	// 攻撃中は動かない
 	if (m_IsAttack) return;
 
-	// アナログスティックの入力を取得
-	FVector2D inputVec = value.Get<FVector2D>();
 
 	// アナログスティックの座標系をUEの3D座標系に変換
-	FVector moveVec(inputVec.Y, inputVec.X, 0.0f);
+	FVector moveVec(0.0f, m_InputVec.X, 0.0f);
 
 	// 移動
 	AddMovementInput(moveVec, m_MoveSpeed);
@@ -98,6 +98,8 @@ void AMagician::InputAttack(const FInputActionValue& value)
 		UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 		if (animInstance && !m_IsAttack)
 		{
+			SetFireDirection();
+
 			m_IsAttack = true;
 			animInstance->Montage_Play(m_AttackMontage);
 		}
@@ -131,4 +133,34 @@ void AMagician::FireBullet()
 void AMagician::EndAttack()
 {
 	m_IsAttack = false;
+}
+
+void AMagician::SetFireDirection()
+{
+	FRotator result = {};
+	FRotator playerRot = GetActorRotation();
+
+	// 必ず真横を向かせる
+
+	// 入力があれば入力を優先
+	if (m_InputVec.X > 0.0f)
+	{
+		result = FRotator(0.0f, 90.0f, 0.0f);
+	}
+	else if (m_InputVec.X < 0.0f)
+	{
+		result = FRotator(0.0f, -90.0f, 0.0f);
+	}
+	// 入力がなければ現在の向きから判定
+	else if (playerRot.Yaw > 0.0f)
+	{
+		result = FRotator(0.0f, 90.0f, 0.0f);
+	}
+	else if (playerRot.Yaw < 0.0f)
+	{
+		result = FRotator(0.0f, -90.0f, 0.0f);
+	}
+
+	// 真横の向きを設定
+	SetActorRotation(result);
 }

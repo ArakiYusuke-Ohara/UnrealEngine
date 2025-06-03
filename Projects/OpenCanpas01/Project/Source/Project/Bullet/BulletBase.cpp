@@ -2,6 +2,7 @@
 
 
 #include "BulletBase.h"
+#include "../Enemy/EnemyBase.h"
 
 // Sets default values
 ABulletBase::ABulletBase()
@@ -47,4 +48,18 @@ void ABulletBase::Disable()
 	m_Active = false;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+}
+
+void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
+{
+	// WorldStatic‚É“–‚½‚Á‚½‚çÁ‚¦‚é
+	if (otherComp && otherComp->GetCollisionObjectType() == ECC_WorldStatic)
+	{
+		Disable();
+	}
+	// “G‚É“–‚½‚Á‚½‚çÁ‚¦‚é
+	if (otherActor && otherActor->IsA(AEnemyBase::StaticClass()))
+	{
+		Disable();
+	}
 }

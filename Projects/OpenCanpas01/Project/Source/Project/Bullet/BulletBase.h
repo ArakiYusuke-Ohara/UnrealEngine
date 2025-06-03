@@ -25,16 +25,22 @@ public:
 
 public:
 	bool IsActive() const { return m_Active; }
+	int GetDamage() const { return m_Damage; }
 
 	virtual void Fire(FVector pos, FRotator rot);
 
 	virtual void Disable();
 
-private:
-	bool m_Active;
+	UFUNCTION(BlueprintCallable)
+	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
 
+protected:
 	UPROPERTY(EditAnywhere)
 	float m_Life;
 
+	UPROPERTY(EditAnywhere)
+	float m_Damage;
+
+	bool m_Active;
 	float m_NowLife;
 };

@@ -51,6 +51,8 @@ public:
 	// UŒ‚I—¹
 	void EndAttack();
 
+private:
+	void SetFireDirection();
 
 private:
 
@@ -76,4 +78,5 @@ private:
 	UAnimMontage* m_AttackMontage;
 
 	bool m_IsAttack;
+	FVector2D m_InputVec;
 };
