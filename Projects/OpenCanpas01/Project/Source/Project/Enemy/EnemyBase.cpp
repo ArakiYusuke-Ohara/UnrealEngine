@@ -3,6 +3,8 @@
 
 #include "EnemyBase.h"
 #include "../Bullet/MagicianBullet.h"
+#include "NiagaraFunctionLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -36,7 +38,7 @@ void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp
 		StartHitStop();
 		BeginDamage(bullet->GetDamage());
 
-		// 吹っ飛ばす場合に使用するベクトル
+		// 吹っ飛ばしに使用するベクトル
 		m_LaunchVec = GetActorLocation() - otherActor->GetActorLocation();
 		m_LaunchVec.Normalize();
 	}
@@ -81,8 +83,15 @@ void AEnemyBase::EndHitStop()
 
 void AEnemyBase::Dead()
 {
-	// 吹っ飛ばす
-	LaunchCharacter(m_LaunchVec * 1000.0f, true, true);
+	// ふっとばしベクトル
+	FVector vec = m_LaunchVec * 1000.0f;
+
+	// 地面にいて下向きに吹っ飛ぶ場合は上向きに吹っ飛ばす
+	if (GetCharacterMovement()->IsMovingOnGround() && vec.Z <= 0.0f)
+	{
+		vec.Z = 500.0f;
+	}
+	LaunchCharacter(vec, true, true);
 
 	// 一定時間後に終了、消滅
 	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::Fin, 0.4f, false);
@@ -90,5 +99,7 @@ void AEnemyBase::Dead()
 
 void AEnemyBase::Fin()
 {
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DeadEffect, GetActorLocation());
+
 	Destroy();
 }

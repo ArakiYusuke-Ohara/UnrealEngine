@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "../Bullet/BulletManager.h"
 #include "../GameInstance/MyGameInstance.h"
+#include "../Enemy/EnemyBase.h"
 
 // Sets default values
 AMagician::AMagician()
@@ -15,7 +16,9 @@ AMagician::AMagician()
 
 	m_Bullet = nullptr;
 	m_IsAttack = false;
-
+	m_IsDamage = false;
+	m_IsInvisible = false;
+	m_InvisibleTime = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -74,9 +77,8 @@ void AMagician::InputMove(const FInputActionValue& value)
 	// アナログスティックの入力を取得
 	m_InputVec = value.Get<FVector2D>();
 
-	// 攻撃中は動かない
 	if (m_IsAttack) return;
-
+	if (m_IsDamage) return;
 
 	// アナログスティックの座標系をUEの3D座標系に変換
 	FVector moveVec(0.0f, m_InputVec.X, 0.0f);
@@ -91,12 +93,15 @@ void AMagician::InputMove(const FInputActionValue& value)
 /// <param name="value">入力値(bool)</param>
 void AMagician::InputAttack(const FInputActionValue& value)
 {
+	if (m_IsAttack) return;
+	if (m_IsDamage) return;
+
 	// 攻撃モンタージュを再生する
 	// 弾の発射はモンタージュから通知される
 	if (m_AttackMontage && GetMesh())
 	{
 		UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
-		if (animInstance && !m_IsAttack)
+		if (animInstance)
 		{
 			SetFireDirection();
 
@@ -113,10 +118,15 @@ void AMagician::InputAttack(const FInputActionValue& value)
 void AMagician::InputJump(const FInputActionValue& value)
 {
 	if (m_IsAttack) return;
+	if (m_IsDamage) return;
 
 	Jump();
 }
 
+/// <summary>
+/// 弾丸を発射する
+/// AnimNotifyから呼び出される
+/// </summary>
 void AMagician::FireBullet()
 {
 	if (m_Bullet)
@@ -130,11 +140,26 @@ void AMagician::FireBullet()
 	}
 }
 
+/// <summary>
+/// 攻撃終了
+/// </summary>
 void AMagician::EndAttack()
 {
 	m_IsAttack = false;
 }
 
+/// <summary>
+/// ダメージ終了
+/// </summary>
+void AMagician::EndDamage()
+{
+	m_IsDamage = false;
+	GetWorld()->GetTimerManager().SetTimer(m_BlinkTimerHandle, this, &AMagician::FlipVisible, 0.1f, true);
+}
+
+/// <summary>
+/// 左右どちらに発射するかを決める
+/// </summary>
 void AMagician::SetFireDirection()
 {
 	FRotator result = {};
@@ -163,4 +188,112 @@ void AMagician::SetFireDirection()
 
 	// 真横の向きを設定
 	SetActorRotation(result);
+}
+
+/// <summary>
+/// ダメージ処理
+/// </summary>
+void AMagician::Damage()
+{
+	m_IsDamage = true;
+
+	// ダメージモンタージュを再生する
+	if (m_DamageMontage && GetMesh())
+	{
+		UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+		if (animInstance)
+		{
+			animInstance->Montage_Play(m_DamageMontage);
+		}
+	}
+
+	// 無敵開始
+	StartInvisible();
+}
+
+/// <summary>
+/// ヒットストップ開始
+/// </summary>
+void AMagician::StartHitStop()
+{
+	CustomTimeDilation = 0.05f;
+	GetWorld()->GetTimerManager().SetTimer(m_HitstopTimerHandle, this, &AMagician::EndHitStop, 0.1f, false);
+}
+
+/// <summary>
+/// ヒットストップ終了
+/// </summary>
+void AMagician::EndHitStop()
+{
+	CustomTimeDilation = 1.0f;
+	LaunchCharacter(m_LaunchVec * 600.0f, true, true);
+}
+
+/// <summary>
+/// 無敵開始
+/// </summary>
+void AMagician::StartInvisible()
+{
+	m_IsInvisible = true;
+	GetWorld()->GetTimerManager().SetTimer(m_InvisibleTimerHandle, this, &AMagician::EndInvisible, m_InvisibleTime, false);
+}
+
+/// <summary>
+/// 無敵終了
+/// </summary>
+void AMagician::EndInvisible()
+{
+	m_IsInvisible = false;
+	GetWorld()->GetTimerManager().ClearTimer(m_BlinkTimerHandle);
+	SetVisible(true);
+}
+
+/// <summary>
+/// 表示/非表示設定
+/// </summary>
+/// <param name="visible"></param>
+void AMagician::SetVisible(bool visible)
+{
+	USkeletalMeshComponent* mesh = GetMesh();
+	if (mesh)
+	{
+		mesh->SetVisibility(visible, true);
+	}
+}
+
+/// <summary>
+/// 表示/非表示反転
+/// </summary>
+void AMagician::FlipVisible()
+{
+	USkeletalMeshComponent* mesh = GetMesh();
+	if (mesh)
+	{
+		bool bVisible = mesh->IsVisible();
+		mesh->SetVisibility(!bVisible, true);
+	}
+}
+
+/// <summary>
+/// オーバーラップ処理
+/// </summary>
+/// <param name="otherActor">当たったアクター</param>
+/// <param name="otherComp">当たったコンポーネント</param>
+void AMagician::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
+{
+	// 敵に当たった
+	if (otherActor->IsA(AEnemyBase::StaticClass()))
+	{
+		if (!m_IsInvisible)
+		{
+			// 吹っ飛びベクトルを計算
+			m_LaunchVec = FVector::ZeroVector;
+			m_LaunchVec.Y = GetActorLocation().Y - otherActor->GetActorLocation().Y;
+			m_LaunchVec.Z = FMath::Abs(m_LaunchVec.Y);
+			m_LaunchVec.Normalize();
+
+			StartHitStop();
+			Damage();
+		}
+	}
 }

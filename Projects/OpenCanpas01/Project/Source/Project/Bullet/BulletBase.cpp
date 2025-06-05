@@ -3,6 +3,7 @@
 
 #include "BulletBase.h"
 #include "../Enemy/EnemyBase.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 ABulletBase::ABulletBase()
@@ -50,7 +51,7 @@ void ABulletBase::Disable()
 	SetActorEnableCollision(false);
 }
 
-void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
+void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp, const FHitResult& hit)
 {
 	// WorldStaticに当たったら消える
 	if (otherComp && otherComp->GetCollisionObjectType() == ECC_WorldStatic)
@@ -60,6 +61,15 @@ void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherCom
 	// 敵に当たったら消える
 	if (otherActor && otherActor->IsA(AEnemyBase::StaticClass()))
 	{
+		FVector otherPos = otherActor->GetActorLocation();
+		FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
+		// ヒットエフェクト
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
+
 		Disable();
 	}
+}
+
+void ABulletBase::PlayHitEffect()
+{
 }

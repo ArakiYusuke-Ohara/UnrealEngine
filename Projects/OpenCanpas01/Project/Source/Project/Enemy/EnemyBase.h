@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "NiagaraComponent.h"
 #include "EnemyBase.generated.h"
 
 UCLASS()
@@ -47,6 +48,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* m_DamageMontage;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* m_DeadEffect;
 
 	FTimerHandle m_TimerHandle;
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NiagaraComponent.h"
 #include "BulletBase.generated.h"
 
 UCLASS()
@@ -32,7 +33,10 @@ public:
 	virtual void Disable();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
+	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp, const FHitResult& hit);
+
+private:
+	void PlayHitEffect();
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -40,6 +44,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float m_Damage;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* m_HitEffect;
 
 	bool m_Active;
 	float m_NowLife;

@@ -29,6 +29,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Attack")
 	bool IsAttacking() const { return m_IsAttack; }
 
+	UFUNCTION(BlueprintPure, Category = "Damage")
+	bool IsDamage() const { return m_IsDamage; }
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -51,8 +54,21 @@ public:
 	// çUåÇèIóπ
 	void EndAttack();
 
+	void EndDamage();
+
+	// ìñÇΩÇËîªíË
+	UFUNCTION(BlueprintCallable)
+	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
+
 private:
 	void SetFireDirection();
+	void Damage();
+	void StartHitStop();
+	void EndHitStop();
+	void StartInvisible();
+	void EndInvisible();
+	void SetVisible(bool visible);
+	void FlipVisible();
 
 private:
 
@@ -77,6 +93,19 @@ private:
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* m_AttackMontage;
 
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* m_DamageMontage;
+
+	UPROPERTY(EditAnywhere)
+	float m_InvisibleTime;
+
 	bool m_IsAttack;
+	bool m_IsDamage;
+	bool m_IsInvisible;
 	FVector2D m_InputVec;
+	FVector m_LaunchVec;
+	FTimerHandle m_HitstopTimerHandle;
+	FTimerHandle m_InvisibleTimerHandle;
+	FTimerHandle m_BlinkTimerHandle;
+
 };
