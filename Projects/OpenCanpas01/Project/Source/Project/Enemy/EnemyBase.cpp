@@ -19,7 +19,8 @@ AEnemyBase::AEnemyBase()
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	m_RespawnPos = GetActorLocation();	
 }
 
 // Called every frame
@@ -27,6 +28,11 @@ void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AEnemyBase::Respawn()
+{
+	SetActorLocation(m_RespawnPos);
 }
 
 void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)

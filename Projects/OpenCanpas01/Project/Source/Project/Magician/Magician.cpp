@@ -4,6 +4,8 @@
 #include "Magician.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "NiagaraFunctionLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "../Bullet/BulletManager.h"
 #include "../GameInstance/MyGameInstance.h"
 #include "../Enemy/EnemyBase.h"
@@ -17,7 +19,7 @@ AMagician::AMagician()
 	m_Bullet = nullptr;
 	m_IsAttack = false;
 	m_IsDamage = false;
-	m_IsInvisible = false;
+	m_IsInvincible = false;
 	m_InvisibleTime = 0.0f;
 }
 
@@ -39,6 +41,9 @@ void AMagician::BeginPlay()
 
 	bUseControllerRotationYaw = false;
 	m_IsAttack = false;
+	m_RespawnPos = GetActorLocation();
+	m_RespawnRot = GetActorRotation();
+	m_HP = m_MaxHP;
 }
 
 // Called every frame
@@ -77,8 +82,7 @@ void AMagician::InputMove(const FInputActionValue& value)
 	// アナログスティックの入力を取得
 	m_InputVec = value.Get<FVector2D>();
 
-	if (m_IsAttack) return;
-	if (m_IsDamage) return;
+	if (!IsControll()) return;
 
 	// アナログスティックの座標系をUEの3D座標系に変換
 	FVector moveVec(0.0f, m_InputVec.X, 0.0f);
@@ -93,8 +97,7 @@ void AMagician::InputMove(const FInputActionValue& value)
 /// <param name="value">入力値(bool)</param>
 void AMagician::InputAttack(const FInputActionValue& value)
 {
-	if (m_IsAttack) return;
-	if (m_IsDamage) return;
+	if (!IsControll()) return;
 
 	// 攻撃モンタージュを再生する
 	// 弾の発射はモンタージュから通知される
@@ -117,8 +120,7 @@ void AMagician::InputAttack(const FInputActionValue& value)
 /// <param name="value">入力値(bool)</param>
 void AMagician::InputJump(const FInputActionValue& value)
 {
-	if (m_IsAttack) return;
-	if (m_IsDamage) return;
+	if (!IsControll()) return;
 
 	Jump();
 }
@@ -195,20 +197,40 @@ void AMagician::SetFireDirection()
 /// </summary>
 void AMagician::Damage()
 {
-	m_IsDamage = true;
-
-	// ダメージモンタージュを再生する
-	if (m_DamageMontage && GetMesh())
+	// ダメージエフェクト
+	if (m_DamageEffect)
 	{
-		UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
-		if (animInstance)
-		{
-			animInstance->Montage_Play(m_DamageMontage);
-		}
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DamageEffect, m_DamagePos);
 	}
 
-	// 無敵開始
-	StartInvisible();
+	// HP減少
+	m_HP--;
+
+	// 死亡判定
+	if (m_HP <= 0)
+	{
+		m_IsDead = true;
+		// 一定時間後に死亡終了処理
+		GetWorld()->GetTimerManager().SetTimer(m_DeadTimerHandle, this, &AMagician::EndDead, 2.0f, false);
+	}
+	// 死亡してない場合
+	else
+	{
+		m_IsDamage = true;
+
+		// ダメージモンタージュを再生する
+		if (m_DamageMontage && GetMesh())
+		{
+			UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+			if (animInstance)
+			{
+				animInstance->Montage_Play(m_DamageMontage);
+			}
+		}
+
+		// 無敵開始
+		StartInvisible();
+	}
 }
 
 /// <summary>
@@ -234,7 +256,7 @@ void AMagician::EndHitStop()
 /// </summary>
 void AMagician::StartInvisible()
 {
-	m_IsInvisible = true;
+	m_IsInvincible = true;
 	GetWorld()->GetTimerManager().SetTimer(m_InvisibleTimerHandle, this, &AMagician::EndInvisible, m_InvisibleTime, false);
 }
 
@@ -243,7 +265,7 @@ void AMagician::StartInvisible()
 /// </summary>
 void AMagician::EndInvisible()
 {
-	m_IsInvisible = false;
+	m_IsInvincible = false;
 	GetWorld()->GetTimerManager().ClearTimer(m_BlinkTimerHandle);
 	SetVisible(true);
 }
@@ -275,22 +297,76 @@ void AMagician::FlipVisible()
 }
 
 /// <summary>
+/// 死亡終了処理
+/// </summary>
+void AMagician::EndDead()
+{
+	// 非表示
+	SetVisible(false);
+
+	// 死亡エフェクト
+	if (m_DeadEffect)
+	{
+		if (GetMesh()->DoesSocketExist(FName("spine_02")))
+		{
+			FVector pos = GetMesh()->GetSocketLocation(FName("spine_02"));
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DeadEffect, pos);
+		}
+	}
+}
+
+/// <summary>
+/// リスポーン処理
+/// </summary>
+void AMagician::Respawn()
+{
+	// 死亡は解除する
+	m_IsDead = false;
+
+	// HP再設定
+	m_HP = m_MaxHP;
+
+	// 表示
+	SetVisible(true);
+	// リスポーン位置にワープ
+	TeleportTo(m_RespawnPos, m_RespawnRot, false, true);
+	// 無敵にしとく
+	StartInvisible();
+	// 無敵点滅
+	GetWorld()->GetTimerManager().SetTimer(m_BlinkTimerHandle, this, &AMagician::FlipVisible, 0.1f, true);
+}
+
+bool AMagician::IsControll()
+{
+	if (m_IsAttack) return false;
+	if (m_IsDamage) return false;
+	if (m_IsDead) return false;
+
+	return true;
+}
+
+/// <summary>
 /// オーバーラップ処理
 /// </summary>
 /// <param name="otherActor">当たったアクター</param>
 /// <param name="otherComp">当たったコンポーネント</param>
 void AMagician::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 {
+	// 死んでいたら何もしない
+	if (m_IsDead) return;
+
 	// 敵に当たった
 	if (otherActor->IsA(AEnemyBase::StaticClass()))
 	{
-		if (!m_IsInvisible)
+		if (!m_IsInvincible)
 		{
 			// 吹っ飛びベクトルを計算
 			m_LaunchVec = FVector::ZeroVector;
 			m_LaunchVec.Y = GetActorLocation().Y - otherActor->GetActorLocation().Y;
 			m_LaunchVec.Z = FMath::Abs(m_LaunchVec.Y);
 			m_LaunchVec.Normalize();
+
+			otherComp->GetClosestPointOnCollision(GetActorLocation(), m_DamagePos);
 
 			StartHitStop();
 			Damage();

@@ -7,6 +7,7 @@
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
+#include "NiagaraComponent.h"
 #include "../Bullet/MagicianBullet.h"
 #include "Magician.generated.h"
 
@@ -32,6 +33,13 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Damage")
 	bool IsDamage() const { return m_IsDamage; }
 
+	UFUNCTION(BlueprintPure, Category = "Dead")
+	bool IsDead() const { return m_IsDead; }
+
+	// “–‚½‚è”»’è
+	UFUNCTION(BlueprintCallable)
+	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -56,9 +64,7 @@ public:
 
 	void EndDamage();
 
-	// “–‚½‚è”»’è
-	UFUNCTION(BlueprintCallable)
-	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
+	void Respawn();
 
 private:
 	void SetFireDirection();
@@ -69,6 +75,8 @@ private:
 	void EndInvisible();
 	void SetVisible(bool visible);
 	void FlipVisible();
+	void EndDead();
+	bool IsControll();
 
 private:
 
@@ -85,6 +93,9 @@ private:
 	UInputAction* m_FireBulletAction;
 
 	UPROPERTY(EditAnywhere)
+	int m_MaxHP;
+
+	UPROPERTY(EditAnywhere)
 	float m_MoveSpeed;
 
 	UPROPERTY(EditAnywhere)
@@ -99,13 +110,25 @@ private:
 	UPROPERTY(EditAnywhere)
 	float m_InvisibleTime;
 
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* m_DamageEffect;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* m_DeadEffect;
+
 	bool m_IsAttack;
 	bool m_IsDamage;
-	bool m_IsInvisible;
+	bool m_IsInvincible;
+	bool m_IsDead;
+	int m_HP;
 	FVector2D m_InputVec;
 	FVector m_LaunchVec;
+	FVector m_DamagePos;
+	FVector m_RespawnPos;
+	FRotator m_RespawnRot;
 	FTimerHandle m_HitstopTimerHandle;
 	FTimerHandle m_InvisibleTimerHandle;
 	FTimerHandle m_BlinkTimerHandle;
-
+	FTimerHandle m_DeadTimerHandle;
+	FTimerHandle m_RespawnTimerHandle;
 };

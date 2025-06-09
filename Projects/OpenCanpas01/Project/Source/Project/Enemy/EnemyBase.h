@@ -24,6 +24,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Respawn();
+
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
 
@@ -55,4 +57,5 @@ protected:
 	FTimerHandle m_TimerHandle;
 
 	FVector m_LaunchVec;
+	FVector m_RespawnPos;
 };

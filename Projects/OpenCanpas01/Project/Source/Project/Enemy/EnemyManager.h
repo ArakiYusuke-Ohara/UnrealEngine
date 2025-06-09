@@ -4,42 +4,36 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TestMap.generated.h"
+#include "EnemyManager.generated.h"
 
-class AMagician;
-
-enum class PlayMapState : uint8
-{
-	PLAY,
-	PLAYER_DEAD,
-	FADE_OUT,
-};
+class AEnemyBase;
 
 UCLASS()
-class PROJECT_API ATestMap : public AActor
+class PROJECT_API AEnemyManager : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATestMap();
+	AEnemyManager();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	void FadeOut();
-	void Restart();
+	// ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+	static AEnemyManager* GetInstance(UWorld* world);
+
+	// “G‚Ì“o˜^‚Æ‰ğœ
+	void RegisterEnemy(AEnemyBase* enemy);
+	void UnregisterEnemy(AEnemyBase* enemy);
+
+	void RespawnAllEnemy();
 
 private:
-	PlayMapState m_State;
-	AMagician* m_Player;
-	FTimerHandle m_TimerHandle;
+	TArray<AEnemyBase*> m_EnemyList;
 };
