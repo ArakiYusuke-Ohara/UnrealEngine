@@ -61,12 +61,16 @@ void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherCom
 	// 敵に当たったら消える
 	if (otherActor && otherActor->IsA(AEnemyBase::StaticClass()))
 	{
-		FVector otherPos = otherActor->GetActorLocation();
-		FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
-		// ヒットエフェクト
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
+		AEnemyBase* enemy = Cast<AEnemyBase>(otherActor);
+		if (!enemy->IsDead())
+		{
+			FVector otherPos = otherActor->GetActorLocation();
+			FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
+			// ヒットエフェクト
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
 
-		Disable();
+			Disable();
+		}
 	}
 }
 

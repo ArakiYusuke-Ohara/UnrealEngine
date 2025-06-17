@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "NiagaraComponent.h"
+#include "AnimNotify/EnemyAttackAnimNotify.h"
 #include "EnemyBase.generated.h"
 
 UCLASS()
@@ -31,6 +32,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsDamage() const { return m_IsDamage; }
+	UFUNCTION(BlueprintCallable)
+	bool IsAttack() const { return m_IsAttack; }
+	bool IsActive() const { return m_IsActive; }
+	bool IsDead() const { return m_HP <= 0; }
 
 	void BeginDamage(int value);
 	void EndDamage();
@@ -38,15 +43,31 @@ public:
 	void StartHitStop();
 	void EndHitStop();
 
+	void Attack(EEnemyAttackType type);
+	void EndAttack();
+
+	void PlayMontage(UAnimMontage* montage);
+
+	bool IsStop() const { return !m_IsActive || m_IsDamage || m_IsAttack; }
+
+
 protected:
+	void SetVisible(bool visible);
 	void Dead();
 	void Fin();
 
+private:
+	virtual void AttackA() {}
+	virtual void AttackB() {}
+	virtual void AttackC() {}
+
 protected:
+	bool m_IsActive;
+	bool m_IsAttack;
 	bool m_IsDamage;
 
 	UPROPERTY(EditAnywhere)
-	int m_HP;
+	int m_MaxHP;
 
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* m_DamageMontage;
@@ -54,8 +75,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* m_DeadEffect;
 
+	int m_HP;
 	FTimerHandle m_TimerHandle;
-
 	FVector m_LaunchVec;
-	FVector m_RespawnPos;
+	FTransform m_RespawnTransform;
 };

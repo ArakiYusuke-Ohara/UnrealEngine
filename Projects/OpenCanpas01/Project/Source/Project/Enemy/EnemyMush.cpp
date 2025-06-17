@@ -8,6 +8,8 @@ void AEnemyMush::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!m_IsActive) return;
+
 	if (!m_IsDamage)
 	{
 		// Œü‚¢‚Ä‚¢‚é•ûŒü‚É‚Ü‚Á‚·‚®i‚Ş

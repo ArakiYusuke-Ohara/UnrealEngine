@@ -4,39 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "NiagaraComponent.h"
-#include "ItemBase.generated.h"
+#include "ItemManager.generated.h"
+
+class AItemBase;
 
 UCLASS()
-class PROJECT_API AItemBase : public AActor
+class PROJECT_API AItemManager : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AItemBase();
+	AItemManager();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void Taked();
-
-	void SetVisible(bool visible);
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
+	// ÉCÉìÉXÉ^ÉìÉXéÊìæ
+	static AItemManager* GetInstance(UWorld* world);
 
-	void Respawn();
+	// ìGÇÃìoò^Ç∆âèú
+	void RegisterItem(AItemBase* item);
+	void UnregisterItem(AItemBase* item);
 
-protected:
-	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* m_GetEffect;
+	void RespawnAllItem();
 
-	bool m_IsActive;
-	FTransform m_RespawnTransform;
+private:
+	TArray<AItemBase*> m_ItemList;
+
 };

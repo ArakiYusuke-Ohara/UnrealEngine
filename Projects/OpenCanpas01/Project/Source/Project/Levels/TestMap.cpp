@@ -5,6 +5,7 @@
 #include "../GameInstance/MyGameInstance.h"
 #include "../Magician/Magician.h"
 #include "../Enemy/EnemyManager.h"
+#include "../Item/ItemManager.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -66,6 +67,9 @@ void ATestMap::Restart()
 
 	// エネミーをリスポーン
 	AEnemyManager::GetInstance(GetWorld())->RespawnAllEnemy();
+
+	// アイテムをリスポーン
+	AItemManager::GetInstance(GetWorld())->RespawnAllItem();
 
 	// フェードイン
 	APlayerController* playerController = GetWorld()->GetFirstPlayerController();

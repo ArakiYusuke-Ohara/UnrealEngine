@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "EnemyBase.h"
-#include "EnemySwarm.generated.h"
+#include "EnemyBeholder.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_API AEnemySwarm : public AEnemyBase
+class PROJECT_API AEnemyBeholder : public AEnemyBase
 {
 	GENERATED_BODY()
 	
@@ -21,4 +21,18 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void AttackA() final;
+
+private:
+	void StartAttack();
+
+protected:
+	UPROPERTY(EditAnywhere)
+	float m_AttackInterval;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* m_AttackMontage;
+
+	float m_AttackTimer;
 };
