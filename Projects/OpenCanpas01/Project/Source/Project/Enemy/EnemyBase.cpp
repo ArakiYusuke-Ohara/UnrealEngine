@@ -79,6 +79,7 @@ void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp
 void AEnemyBase::BeginDamage(int value)
 {
 	m_IsDamage = true;
+	m_IsAttack = false;
 	m_HP -= value;
 
 	// アニメーションをモンタージュから再生

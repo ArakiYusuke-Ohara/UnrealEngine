@@ -33,6 +33,8 @@ void AEnemyBeholder::Tick(float DeltaTime)
 /// </summary>
 void AEnemyBeholder::StartAttack()
 {
+	if (m_IsDamage) return;
+
 	m_IsAttack = true;
 	PlayMontage(m_AttackMontage);
 	m_AttackTimer = m_AttackInterval;
