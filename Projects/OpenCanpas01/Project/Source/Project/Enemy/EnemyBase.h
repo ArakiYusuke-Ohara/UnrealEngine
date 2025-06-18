@@ -8,6 +8,8 @@
 #include "AnimNotify/EnemyAttackAnimNotify.h"
 #include "EnemyBase.generated.h"
 
+class AMagician;
+
 UCLASS()
 class PROJECT_API AEnemyBase : public ACharacter
 {
@@ -48,7 +50,7 @@ public:
 
 	void PlayMontage(UAnimMontage* montage);
 
-	bool IsStop() const { return !m_IsActive || m_IsDamage || m_IsAttack; }
+	bool IsStop() const { return !m_IsActive || m_IsDamage || m_IsAttack || !m_IsStart; }
 
 
 protected:
@@ -63,6 +65,7 @@ private:
 
 protected:
 	bool m_IsActive;
+	bool m_IsStart;
 	bool m_IsAttack;
 	bool m_IsDamage;
 
@@ -75,7 +78,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* m_DeadEffect;
 
+	UPROPERTY(EditAnywhere)
+	float m_StartDistance;
+
 	int m_HP;
+	AMagician* m_Player;
 	FTimerHandle m_TimerHandle;
 	FVector m_LaunchVec;
 	FTransform m_RespawnTransform;

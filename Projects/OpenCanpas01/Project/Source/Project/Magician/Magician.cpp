@@ -374,7 +374,11 @@ void AMagician::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 	// “G‚É“–‚½‚Á‚½
 	if (otherActor->IsA(AEnemyBase::StaticClass()))
 	{
-		HitDamageObject(otherActor, otherComp);
+		AEnemyBase* enemy = Cast<AEnemyBase>(otherActor);
+		if (!enemy->IsDead())
+		{
+			HitDamageObject(otherActor, otherComp);
+		}
 	}
 	// “G‚Ì’e‚É“–‚½‚Á‚½
 	else if (otherActor->IsA(ABulletBase::StaticClass()))

@@ -19,6 +19,8 @@ void AEnemyBeholder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsStop()) return;
+
 	// ˆê’èŠÔ‚²‚Æ‚ÉUŒ‚
 	if (m_AttackTimer <= 0.0f)
 	{

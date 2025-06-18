@@ -3,8 +3,10 @@
 
 #include "EnemyBase.h"
 #include "../Bullet/MagicianBullet.h"
+#include "../Magician/Magician.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -23,6 +25,8 @@ void AEnemyBase::BeginPlay()
 	m_RespawnTransform = GetActorTransform();
 	m_IsActive = true;
 	m_HP = m_MaxHP;
+	ACharacter* player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	m_Player = Cast<AMagician>(player);
 }
 
 // Called every frame
@@ -30,6 +34,15 @@ void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!m_IsStart && m_Player)
+	{
+		// プレイヤーがある程度近づいたら動き出す
+		float dist = FVector::Dist(GetActorLocation(), m_Player->GetActorLocation());
+		if (dist <= m_StartDistance)
+		{
+			m_IsStart = true;
+		}
+	}
 }
 
 /// <summary>

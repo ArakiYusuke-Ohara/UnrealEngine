@@ -8,7 +8,7 @@ void AEnemyMush::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!m_IsActive) return;
+	if (IsStop()) return;
 
 	if (!m_IsDamage)
 	{
