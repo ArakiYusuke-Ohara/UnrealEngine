@@ -7,6 +7,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../Bullet/BulletManager.h"
+#include "../Bullet/MagicianBullet.h"
 #include "../GameInstance/MyGameInstance.h"
 #include "../Enemy/EnemyBase.h"
 
@@ -192,6 +193,20 @@ void AMagician::SetFireDirection()
 	SetActorRotation(result);
 }
 
+void AMagician::HitDamageObject(AActor* otherActor, UPrimitiveComponent* otherComp)
+{
+	// 吹っ飛びベクトルを計算
+	m_LaunchVec = FVector::ZeroVector;
+	m_LaunchVec.Y = GetActorLocation().Y - otherActor->GetActorLocation().Y;
+	m_LaunchVec.Z = FMath::Abs(m_LaunchVec.Y);
+	m_LaunchVec.Normalize();
+
+	otherComp->GetClosestPointOnCollision(GetActorLocation(), m_DamagePos);
+
+	StartHitStop();
+	Damage();
+}
+
 /// <summary>
 /// ダメージ処理
 /// </summary>
@@ -354,22 +369,20 @@ void AMagician::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 {
 	// 死んでいたら何もしない
 	if (m_IsDead) return;
+	if (m_IsInvincible) return;
 
 	// 敵に当たった
 	if (otherActor->IsA(AEnemyBase::StaticClass()))
 	{
-		if (!m_IsInvincible)
+		HitDamageObject(otherActor, otherComp);
+	}
+	// 敵の弾に当たった
+	else if (otherActor->IsA(ABulletBase::StaticClass()))
+	{
+		ABulletBase* bullet = Cast<ABulletBase>(otherActor);
+		if (bullet->GetOwnerType() == EBulletOwner::Enemy)
 		{
-			// 吹っ飛びベクトルを計算
-			m_LaunchVec = FVector::ZeroVector;
-			m_LaunchVec.Y = GetActorLocation().Y - otherActor->GetActorLocation().Y;
-			m_LaunchVec.Z = FMath::Abs(m_LaunchVec.Y);
-			m_LaunchVec.Normalize();
-
-			otherComp->GetClosestPointOnCollision(GetActorLocation(), m_DamagePos);
-
-			StartHitStop();
-			Damage();
+			HitDamageObject(otherActor, otherComp);
 		}
 	}
 }

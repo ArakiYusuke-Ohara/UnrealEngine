@@ -6,6 +6,8 @@
 #include "EnemyBase.h"
 #include "EnemyBeholder.generated.h"
 
+class AMagicianBullet;
+
 /**
  * 
  */
@@ -33,6 +35,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* m_AttackMontage;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMagicianBullet> m_Bullet;
 
 	float m_AttackTimer;
 };

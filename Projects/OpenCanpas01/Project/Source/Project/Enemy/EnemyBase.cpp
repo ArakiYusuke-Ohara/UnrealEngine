@@ -57,15 +57,18 @@ void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp
 	if (IsDead())return;
 
 	// プレイヤーの弾丸に当たった
-	if (otherActor->IsA(AMagicianBullet::StaticClass()))
+	if (otherActor->IsA(ABulletBase::StaticClass()))
 	{
-		AMagicianBullet* bullet = Cast<AMagicianBullet>(otherActor);
-		StartHitStop();
-		BeginDamage(bullet->GetDamage());
+		ABulletBase* bullet = Cast<ABulletBase>(otherActor);
+		if (bullet->GetOwnerType() == EBulletOwner::Player)
+		{
+			StartHitStop();
+			BeginDamage(bullet->GetDamage());
 
-		// 吹っ飛ばしに使用するベクトル
-		m_LaunchVec = GetActorLocation() - otherActor->GetActorLocation();
-		m_LaunchVec.Normalize();
+			// 吹っ飛ばしに使用するベクトル
+			m_LaunchVec = GetActorLocation() - otherActor->GetActorLocation();
+			m_LaunchVec.Normalize();
+		}
 	}
 }
 

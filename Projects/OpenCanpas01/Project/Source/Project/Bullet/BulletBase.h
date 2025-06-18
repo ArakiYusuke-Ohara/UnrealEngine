@@ -7,6 +7,13 @@
 #include "NiagaraComponent.h"
 #include "BulletBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EBulletOwner : uint8
+{
+	Player,
+	Enemy,
+};
+
 UCLASS()
 class PROJECT_API ABulletBase : public AActor
 {
@@ -27,6 +34,7 @@ public:
 public:
 	bool IsActive() const { return m_Active; }
 	int GetDamage() const { return m_Damage; }
+	EBulletOwner GetOwnerType() const { return m_OwnerType; }
 
 	virtual void Fire(FVector pos, FRotator rot);
 
@@ -47,6 +55,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* m_HitEffect;
+
+	// èäóLé“Çé¶Ç∑ïœêî
+	UPROPERTY(EditAnywhere)
+	EBulletOwner m_OwnerType;
 
 	bool m_Active;
 	float m_NowLife;

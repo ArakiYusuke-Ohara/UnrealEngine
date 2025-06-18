@@ -2,8 +2,9 @@
 
 
 #include "BulletBase.h"
-#include "../Enemy/EnemyBase.h"
 #include "NiagaraFunctionLibrary.h"
+#include "../Enemy/EnemyBase.h"
+#include "../Magician/Magician.h"
 
 // Sets default values
 ABulletBase::ABulletBase()
@@ -58,18 +59,40 @@ void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherCom
 	{
 		Disable();
 	}
-	// 敵に当たったら消える
-	if (otherActor && otherActor->IsA(AEnemyBase::StaticClass()))
+	// プレイヤーが撃った弾のヒット処理
+	if (m_OwnerType == EBulletOwner::Player)
 	{
-		AEnemyBase* enemy = Cast<AEnemyBase>(otherActor);
-		if (!enemy->IsDead())
+		// 敵に当たったら消える
+		if (otherActor && otherActor->IsA(AEnemyBase::StaticClass()))
 		{
-			FVector otherPos = otherActor->GetActorLocation();
-			FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
-			// ヒットエフェクト
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
+			AEnemyBase* enemy = Cast<AEnemyBase>(otherActor);
+			if (!enemy->IsDead())
+			{
+				FVector otherPos = otherActor->GetActorLocation();
+				FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
+				// ヒットエフェクト
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
 
-			Disable();
+				Disable();
+			}
+		}
+	}
+	// 敵が撃った弾のヒット処理
+	else if (m_OwnerType == EBulletOwner::Enemy)
+	{
+		// プレイヤーに当たったら消える
+		if (otherActor && otherActor->IsA(AMagician::StaticClass()))
+		{
+			AMagician* magician = Cast<AMagician>(otherActor);
+			if (!magician->IsDead())
+			{
+				FVector otherPos = otherActor->GetActorLocation();
+				FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
+				// ヒットエフェクト
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
+
+				Disable();
+			}
 		}
 	}
 }

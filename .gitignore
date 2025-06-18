@@ -493,6 +493,9 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# temp encryption folder
+enc_temp_folder/
+
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 

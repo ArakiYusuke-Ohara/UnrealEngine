@@ -9,8 +9,8 @@ void AMagicianBullet::BeginPlay()
 {
 	Super::BeginPlay();
 
-	m_Mesh = FindComponentByClass<UStaticMeshComponent>();
 	m_Movement = FindComponentByClass<UProjectileMovementComponent>();
+
 }
 
 void AMagicianBullet::Fire(FVector pos, FRotator rot)
@@ -23,10 +23,11 @@ void AMagicianBullet::Fire(FVector pos, FRotator rot)
 		float Speed = m_Movement->InitialSpeed;
 		m_Movement->Velocity = ForwardDir * Speed;
 	}
-	if (m_Particle && m_Mesh)
+	if (m_Particle)
 	{
-		m_ParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(m_Particle, m_Mesh, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTargetIncludingScale, true);
+		m_ParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(m_Particle, RootComponent, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTargetIncludingScale, true);
 	}
+
 }
 
 void AMagicianBullet::Disable()

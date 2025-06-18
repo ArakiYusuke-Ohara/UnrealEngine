@@ -26,7 +26,6 @@ public:
 	virtual void Disable() override;
 
 private:
-	UStaticMeshComponent* m_Mesh;
 	UProjectileMovementComponent* m_Movement;
 
 	UPROPERTY(EditAnywhere)

@@ -8,7 +8,6 @@
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "NiagaraComponent.h"
-#include "../Bullet/MagicianBullet.h"
 #include "Magician.generated.h"
 
 class AMagicianBullet;
@@ -68,6 +67,7 @@ public:
 
 private:
 	void SetFireDirection();
+	void HitDamageObject(AActor* otherActor, UPrimitiveComponent* otherComp);
 	void Damage();
 	void StartHitStop();
 	void EndHitStop();
