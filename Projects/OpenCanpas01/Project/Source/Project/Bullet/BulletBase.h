@@ -62,4 +62,5 @@ protected:
 
 	bool m_Active;
 	float m_NowLife;
+	float m_CoolTime;
 };

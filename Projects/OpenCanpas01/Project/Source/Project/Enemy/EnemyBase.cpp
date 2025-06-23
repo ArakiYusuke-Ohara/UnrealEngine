@@ -211,7 +211,7 @@ void AEnemyBase::Dead()
 void AEnemyBase::Fin()
 {
 	// 死亡エフェクト
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DeadEffect, GetActorLocation());
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DeadEffect, GetActorLocation(), FRotator::ZeroRotator, GetActorScale());
 
 	// 非アクティブと非表示
 	m_IsActive = false;

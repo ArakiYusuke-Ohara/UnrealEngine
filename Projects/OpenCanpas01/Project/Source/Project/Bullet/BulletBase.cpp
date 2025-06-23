@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#define BULLET_COOL_TIME 30.0f;
 
 #include "BulletBase.h"
 #include "NiagaraFunctionLibrary.h"
@@ -28,6 +29,8 @@ void ABulletBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!m_Active) return;
+
 	if (m_NowLife <= 0.0f && m_Active)
 	{
 		Disable();
@@ -48,17 +51,13 @@ void ABulletBase::Fire(FVector pos, FRotator rot)
 void ABulletBase::Disable()
 {
 	m_Active = false;
+	m_CoolTime = BULLET_COOL_TIME;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 }
 
 void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp, const FHitResult& hit)
 {
-	// WorldStaticに当たったら消える
-	if (otherComp && otherComp->GetCollisionObjectType() == ECC_WorldStatic)
-	{
-		Disable();
-	}
 	// プレイヤーが撃った弾のヒット処理
 	if (m_OwnerType == EBulletOwner::Player)
 	{
