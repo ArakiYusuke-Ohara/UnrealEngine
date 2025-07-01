@@ -15,6 +15,7 @@ AEnemyBase::AEnemyBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	m_IsDamage = false;
+	m_HitStopTime = 0.1f;
 }
 
 // Called when the game starts or when spawned
@@ -113,7 +114,7 @@ void AEnemyBase::EndDamage()
 void AEnemyBase::StartHitStop()
 {
 	CustomTimeDilation = 0.05f;
-	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::EndHitStop, 0.1f, false);
+	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::EndHitStop, m_HitStopTime, false);
 }
 
 /// <summary>
@@ -198,7 +199,7 @@ void AEnemyBase::Dead()
 	// 吹っ飛ばすにはCharacterMovementが必要なので確実に復活させる
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
-	// 吹っ飛ばす
+	// ③吹っ飛ばす
 	LaunchCharacter(vec, true, true);
 
 	// 一定時間後に終了、消滅

@@ -81,6 +81,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float m_StartDistance;
 
+	UPROPERTY(EditAnywhere)
+	float m_HitStopTime;
+
 	int m_HP;
 	AMagician* m_Player;
 	FTimerHandle m_TimerHandle;

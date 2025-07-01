@@ -29,13 +29,20 @@ void AItemBase::Tick(float DeltaTime)
 
 }
 
+/// <summary>
+/// アイテムのプログラム
+/// 何かが重なったときに処理される
+/// </summary>
+/// <param name="otherActor">重なってきたもの</param>
+/// <param name="otherComp">重なってきたものが持つコンポーネント</param>
 void AItemBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 {
 	if (!m_IsActive)return;
 
-	// プレイヤーに当たった
 	if (otherActor->IsA(AMagician::StaticClass()))
-	{
+	{ // プレイヤーが重なった
+		
+		// ①アイテムが取られた！！ 
 		Taked();
 	}
 }
@@ -49,14 +56,16 @@ void AItemBase::Respawn()
 	SetVisible(true);
 }
 
+/// <summary>
+/// アイテムが取られた
+/// </summary>
 void AItemBase::Taked()
 {
 	// ゲットエフェクト
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_GetEffect, GetActorLocation());
 
-	// 非アクティブと非表示
-	m_IsActive = false;
-	SetVisible(false);
+	// 取られたので無効化
+	Disable();
 }
 
 /// <summary>
@@ -70,4 +79,14 @@ void AItemBase::SetVisible(bool visible)
 	{
 		mesh->SetVisibility(visible, true);
 	}
+}
+
+/// <summary>
+/// 無効化する
+/// 非表示となり何者とも干渉しなくなる
+/// </summary>
+void AItemBase::Disable()
+{
+	m_IsActive = false;
+	SetVisible(false);
 }

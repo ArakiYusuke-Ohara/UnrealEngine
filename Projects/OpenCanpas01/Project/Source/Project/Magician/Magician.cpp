@@ -138,6 +138,7 @@ void AMagician::FireBullet()
 		UBulletManager* bulletManager = gameInstance->GetBulletManager();
 		if (bulletManager)
 		{
+			// ‡A’eŠÛ‚ð”­ŽË‚·‚éII
 			bulletManager->FireBullet(m_Bullet, GetActorLocation(), GetActorRotation());
 		}
 	}

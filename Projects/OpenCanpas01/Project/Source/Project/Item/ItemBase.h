@@ -23,6 +23,7 @@ protected:
 	virtual void Taked();
 
 	void SetVisible(bool visible);
+	void Disable();
 
 public:	
 	// Called every frame
