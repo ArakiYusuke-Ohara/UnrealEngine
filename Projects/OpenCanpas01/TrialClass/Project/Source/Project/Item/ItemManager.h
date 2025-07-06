@@ -1,0 +1,40 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "ItemManager.generated.h"
+
+class AItemBase;
+
+UCLASS()
+class PROJECT_API AItemManager : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AItemManager();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+	static AItemManager* GetInstance(UWorld* world);
+
+	// “G‚Ì“o˜^‚Æ‰ğœ
+	void RegisterItem(AItemBase* item);
+	void UnregisterItem(AItemBase* item);
+
+	void RespawnAllItem();
+
+private:
+	TArray<AItemBase*> m_ItemList;
+
+};
