@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Magician.h"
@@ -29,7 +29,7 @@ void AMagician::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// ƒCƒ“ƒvƒbƒgƒ}ƒbƒv‚ğİ’è
+	// ã‚¤ãƒ³ãƒ—ãƒƒãƒˆãƒãƒƒãƒ—ã‚’è¨­å®š
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
 	{
@@ -51,6 +51,12 @@ void AMagician::BeginPlay()
 void AMagician::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// è½ä¸‹æ­»åˆ¤å®š
+	if (m_IsDead == false && GetActorLocation().Z <= -1000.0f)
+	{
+		StartDead();
+	}
 }
 
 // Called to bind functionality to input
@@ -58,50 +64,50 @@ void AMagician::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// “ü—ÍƒAƒNƒVƒ‡ƒ“‚ğİ’è
+	// å…¥åŠ›ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’è¨­å®š
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
-		// ƒWƒƒƒ“ƒv
+		// ã‚¸ãƒ£ãƒ³ãƒ—
 		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Started, this, &AMagician::InputJump);
 		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-		// ˆÚ“®
+		// ç§»å‹•
 		EnhancedInputComponent->BindAction(m_MoveAction, ETriggerEvent::Triggered, this, &AMagician::InputMove);
 
-		// ’eŠÛ”­Ë
+		// å¼¾ä¸¸ç™ºå°„
 		EnhancedInputComponent->BindAction(m_FireBulletAction, ETriggerEvent::Started, this, &AMagician::InputAttack);
 	}
 
 }
 
 /// <summary>
-/// “ü—ÍˆÚ“®ˆ—
+/// å…¥åŠ›ç§»å‹•å‡¦ç†
 /// </summary>
-/// <param name="value">“ü—Í’l(FVector2D)</param>
+/// <param name="value">å…¥åŠ›å€¤(FVector2D)</param>
 void AMagician::InputMove(const FInputActionValue& value)
 {
-	// ƒAƒiƒƒOƒXƒeƒBƒbƒN‚Ì“ü—Í‚ğæ“¾
+	// ã‚¢ãƒŠãƒ­ã‚°ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®å…¥åŠ›ã‚’å–å¾—
 	m_InputVec = value.Get<FVector2D>();
 
 	if (!IsControll()) return;
 
-	// ƒAƒiƒƒOƒXƒeƒBƒbƒN‚ÌÀ•WŒn‚ğUE‚Ì3DÀ•WŒn‚É•ÏŠ·
+	// ã‚¢ãƒŠãƒ­ã‚°ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®åº§æ¨™ç³»ã‚’UEã®3Dåº§æ¨™ç³»ã«å¤‰æ›
 	FVector moveVec(0.0f, m_InputVec.X, 0.0f);
 
-	// ˆÚ“®
+	// ç§»å‹•
 	AddMovementInput(moveVec, m_MoveSpeed);
 }
 
 /// <summary>
-/// UŒ‚
+/// æ”»æ’ƒ
 /// </summary>
-/// <param name="value">“ü—Í’l(bool)</param>
+/// <param name="value">å…¥åŠ›å€¤(bool)</param>
 void AMagician::InputAttack(const FInputActionValue& value)
 {
 	if (!IsControll()) return;
 
-	// UŒ‚ƒ‚ƒ“ƒ^[ƒWƒ…‚ğÄ¶‚·‚é
-	// ’e‚Ì”­Ë‚Íƒ‚ƒ“ƒ^[ƒWƒ…‚©‚ç’Ê’m‚³‚ê‚é
+	// æ”»æ’ƒãƒ¢ãƒ³ã‚¿ãƒ¼ã‚¸ãƒ¥ã‚’å†ç”Ÿã™ã‚‹
+	// å¼¾ã®ç™ºå°„ã¯ãƒ¢ãƒ³ã‚¿ãƒ¼ã‚¸ãƒ¥ã‹ã‚‰é€šçŸ¥ã•ã‚Œã‚‹
 	if (m_AttackMontage && GetMesh())
 	{
 		UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
@@ -116,9 +122,9 @@ void AMagician::InputAttack(const FInputActionValue& value)
 }
 
 /// <summary>
-/// ƒWƒƒƒ“ƒv
+/// ã‚¸ãƒ£ãƒ³ãƒ—
 /// </summary>
-/// <param name="value">“ü—Í’l(bool)</param>
+/// <param name="value">å…¥åŠ›å€¤(bool)</param>
 void AMagician::InputJump(const FInputActionValue& value)
 {
 	if (!IsControll()) return;
@@ -127,8 +133,8 @@ void AMagician::InputJump(const FInputActionValue& value)
 }
 
 /// <summary>
-/// ’eŠÛ‚ğ”­Ë‚·‚é
-/// AnimNotify‚©‚çŒÄ‚Ño‚³‚ê‚é
+/// å¼¾ä¸¸ã‚’ç™ºå°„ã™ã‚‹
+/// AnimNotifyã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã‚‹
 /// </summary>
 void AMagician::FireBullet()
 {
@@ -138,14 +144,14 @@ void AMagician::FireBullet()
 		UBulletManager* bulletManager = gameInstance->GetBulletManager();
 		if (bulletManager)
 		{
-			// ‡A’eŠÛ‚ğ”­Ë‚·‚éII
+			// â‘¡å¼¾ä¸¸ã‚’ç™ºå°„ã™ã‚‹ï¼ï¼
 			bulletManager->FireBullet(m_Bullet, GetActorLocation(), GetActorRotation());
 		}
 	}
 }
 
 /// <summary>
-/// UŒ‚I—¹
+/// æ”»æ’ƒçµ‚äº†
 /// </summary>
 void AMagician::EndAttack()
 {
@@ -153,7 +159,7 @@ void AMagician::EndAttack()
 }
 
 /// <summary>
-/// ƒ_ƒ[ƒWI—¹
+/// ãƒ€ãƒ¡ãƒ¼ã‚¸çµ‚äº†
 /// </summary>
 void AMagician::EndDamage()
 {
@@ -162,16 +168,16 @@ void AMagician::EndDamage()
 }
 
 /// <summary>
-/// ¶‰E‚Ç‚¿‚ç‚É”­Ë‚·‚é‚©‚ğŒˆ‚ß‚é
+/// å·¦å³ã©ã¡ã‚‰ã«ç™ºå°„ã™ã‚‹ã‹ã‚’æ±ºã‚ã‚‹
 /// </summary>
 void AMagician::SetFireDirection()
 {
 	FRotator result = {};
 	FRotator playerRot = GetActorRotation();
 
-	// •K‚¸^‰¡‚ğŒü‚©‚¹‚é
+	// å¿…ãšçœŸæ¨ªã‚’å‘ã‹ã›ã‚‹
 
-	// “ü—Í‚ª‚ ‚ê‚Î“ü—Í‚ğ—Dæ
+	// å…¥åŠ›ãŒã‚ã‚Œã°å…¥åŠ›ã‚’å„ªå…ˆ
 	if (m_InputVec.X > 0.0f)
 	{
 		result = FRotator(0.0f, 90.0f, 0.0f);
@@ -180,7 +186,7 @@ void AMagician::SetFireDirection()
 	{
 		result = FRotator(0.0f, -90.0f, 0.0f);
 	}
-	// “ü—Í‚ª‚È‚¯‚ê‚ÎŒ»İ‚ÌŒü‚«‚©‚ç”»’è
+	// å…¥åŠ›ãŒãªã‘ã‚Œã°ç¾åœ¨ã®å‘ãã‹ã‚‰åˆ¤å®š
 	else if (playerRot.Yaw > 0.0f)
 	{
 		result = FRotator(0.0f, 90.0f, 0.0f);
@@ -190,13 +196,13 @@ void AMagician::SetFireDirection()
 		result = FRotator(0.0f, -90.0f, 0.0f);
 	}
 
-	// ^‰¡‚ÌŒü‚«‚ğİ’è
+	// çœŸæ¨ªã®å‘ãã‚’è¨­å®š
 	SetActorRotation(result);
 }
 
 void AMagician::HitDamageObject(AActor* otherActor, UPrimitiveComponent* otherComp)
 {
-	// ‚Á”ò‚ÑƒxƒNƒgƒ‹‚ğŒvZ
+	// å¹ã£é£›ã³ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨ˆç®—
 	m_LaunchVec = FVector::ZeroVector;
 	m_LaunchVec.Y = GetActorLocation().Y - otherActor->GetActorLocation().Y;
 	m_LaunchVec.Z = FMath::Abs(m_LaunchVec.Y);
@@ -209,32 +215,30 @@ void AMagician::HitDamageObject(AActor* otherActor, UPrimitiveComponent* otherCo
 }
 
 /// <summary>
-/// ƒ_ƒ[ƒWˆ—
+/// ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 /// </summary>
 void AMagician::Damage()
 {
-	// ƒ_ƒ[ƒWƒGƒtƒFƒNƒg
+	// ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	if (m_DamageEffect)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DamageEffect, m_DamagePos);
 	}
 
-	// HPŒ¸­
+	// HPæ¸›å°‘
 	m_HP--;
 
-	// €–S”»’è
+	// æ­»äº¡åˆ¤å®š
 	if (m_HP <= 0)
 	{
-		m_IsDead = true;
-		// ˆê’èŠÔŒã‚É€–SI—¹ˆ—
-		GetWorld()->GetTimerManager().SetTimer(m_DeadTimerHandle, this, &AMagician::EndDead, 2.0f, false);
+		StartDead();
 	}
-	// €–S‚µ‚Ä‚È‚¢ê‡
+	// æ­»äº¡ã—ã¦ãªã„å ´åˆ
 	else
 	{
 		m_IsDamage = true;
 
-		// ƒ_ƒ[ƒWƒ‚ƒ“ƒ^[ƒWƒ…‚ğÄ¶‚·‚é
+		// ãƒ€ãƒ¡ãƒ¼ã‚¸ãƒ¢ãƒ³ã‚¿ãƒ¼ã‚¸ãƒ¥ã‚’å†ç”Ÿã™ã‚‹
 		if (m_DamageMontage && GetMesh())
 		{
 			UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
@@ -244,13 +248,13 @@ void AMagician::Damage()
 			}
 		}
 
-		// –³“GŠJn
+		// ç„¡æ•µé–‹å§‹
 		StartInvisible();
 	}
 }
 
 /// <summary>
-/// ƒqƒbƒgƒXƒgƒbƒvŠJn
+/// ãƒ’ãƒƒãƒˆã‚¹ãƒˆãƒƒãƒ—é–‹å§‹
 /// </summary>
 void AMagician::StartHitStop()
 {
@@ -259,7 +263,7 @@ void AMagician::StartHitStop()
 }
 
 /// <summary>
-/// ƒqƒbƒgƒXƒgƒbƒvI—¹
+/// ãƒ’ãƒƒãƒˆã‚¹ãƒˆãƒƒãƒ—çµ‚äº†
 /// </summary>
 void AMagician::EndHitStop()
 {
@@ -268,7 +272,7 @@ void AMagician::EndHitStop()
 }
 
 /// <summary>
-/// –³“GŠJn
+/// ç„¡æ•µé–‹å§‹
 /// </summary>
 void AMagician::StartInvisible()
 {
@@ -277,7 +281,7 @@ void AMagician::StartInvisible()
 }
 
 /// <summary>
-/// –³“GI—¹
+/// ç„¡æ•µçµ‚äº†
 /// </summary>
 void AMagician::EndInvisible()
 {
@@ -287,7 +291,7 @@ void AMagician::EndInvisible()
 }
 
 /// <summary>
-/// •\¦/”ñ•\¦İ’è
+/// è¡¨ç¤º/éè¡¨ç¤ºè¨­å®š
 /// </summary>
 /// <param name="visible"></param>
 void AMagician::SetVisible(bool visible)
@@ -300,7 +304,7 @@ void AMagician::SetVisible(bool visible)
 }
 
 /// <summary>
-/// •\¦/”ñ•\¦”½“]
+/// è¡¨ç¤º/éè¡¨ç¤ºåè»¢
 /// </summary>
 void AMagician::FlipVisible()
 {
@@ -313,14 +317,25 @@ void AMagician::FlipVisible()
 }
 
 /// <summary>
-/// €–SI—¹ˆ—
+/// æ­»äº¡é–‹å§‹å‡¦ç†
+/// </summary>
+
+void AMagician::StartDead()
+{
+	m_IsDead = true;
+	// ä¸€å®šæ™‚é–“å¾Œã«æ­»äº¡çµ‚äº†å‡¦ç†
+	GetWorld()->GetTimerManager().SetTimer(m_DeadTimerHandle, this, &AMagician::EndDead, 2.0f, false);
+}
+
+/// <summary>
+/// æ­»äº¡çµ‚äº†å‡¦ç†
 /// </summary>
 void AMagician::EndDead()
 {
-	// ”ñ•\¦
+	// éè¡¨ç¤º
 	SetVisible(false);
 
-	// €–SƒGƒtƒFƒNƒg
+	// æ­»äº¡ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	if (m_DeadEffect)
 	{
 		if (GetMesh()->DoesSocketExist(FName("spine_02")))
@@ -332,23 +347,23 @@ void AMagician::EndDead()
 }
 
 /// <summary>
-/// ƒŠƒXƒ|[ƒ“ˆ—
+/// ãƒªã‚¹ãƒãƒ¼ãƒ³å‡¦ç†
 /// </summary>
 void AMagician::Respawn()
 {
-	// €–S‚Í‰ğœ‚·‚é
+	// æ­»äº¡ã¯è§£é™¤ã™ã‚‹
 	m_IsDead = false;
 
-	// HPÄİ’è
+	// HPå†è¨­å®š
 	m_HP = m_MaxHP;
 
-	// •\¦
+	// è¡¨ç¤º
 	SetVisible(true);
-	// ƒŠƒXƒ|[ƒ“ˆÊ’u‚Éƒ[ƒv
+	// ãƒªã‚¹ãƒãƒ¼ãƒ³ä½ç½®ã«ãƒ¯ãƒ¼ãƒ—
 	TeleportTo(m_RespawnPos, m_RespawnRot, false, true);
-	// –³“G‚É‚µ‚Æ‚­
+	// ç„¡æ•µã«ã—ã¨ã
 	StartInvisible();
-	// –³“G“_–Å
+	// ç„¡æ•µç‚¹æ»…
 	GetWorld()->GetTimerManager().SetTimer(m_BlinkTimerHandle, this, &AMagician::FlipVisible, 0.1f, true);
 }
 
@@ -362,17 +377,17 @@ bool AMagician::IsControll()
 }
 
 /// <summary>
-/// ƒI[ƒo[ƒ‰ƒbƒvˆ—
+/// ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ—å‡¦ç†
 /// </summary>
-/// <param name="otherActor">“–‚½‚Á‚½ƒAƒNƒ^[</param>
-/// <param name="otherComp">“–‚½‚Á‚½ƒRƒ“ƒ|[ƒlƒ“ƒg</param>
+/// <param name="otherActor">å½“ãŸã£ãŸã‚¢ã‚¯ã‚¿ãƒ¼</param>
+/// <param name="otherComp">å½“ãŸã£ãŸã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ</param>
 void AMagician::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 {
-	// €‚ñ‚Å‚¢‚½‚ç‰½‚à‚µ‚È‚¢
+	// æ­»ã‚“ã§ã„ãŸã‚‰ä½•ã‚‚ã—ãªã„
 	if (m_IsDead) return;
 	if (m_IsInvincible) return;
 
-	// “G‚É“–‚½‚Á‚½
+	// æ•µã«å½“ãŸã£ãŸ
 	if (otherActor->IsA(AEnemyBase::StaticClass()))
 	{
 		AEnemyBase* enemy = Cast<AEnemyBase>(otherActor);
@@ -381,7 +396,7 @@ void AMagician::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 			HitDamageObject(otherActor, otherComp);
 		}
 	}
-	// “G‚Ì’e‚É“–‚½‚Á‚½
+	// æ•µã®å¼¾ã«å½“ãŸã£ãŸ
 	else if (otherActor->IsA(ABulletBase::StaticClass()))
 	{
 		ABulletBase* bullet = Cast<ABulletBase>(otherActor);

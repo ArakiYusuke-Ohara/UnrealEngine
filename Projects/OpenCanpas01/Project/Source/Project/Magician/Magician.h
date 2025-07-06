@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -35,7 +35,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Dead")
 	bool IsDead() const { return m_IsDead; }
 
-	// “–‚½‚è”»’è
+	// å½“ãŸã‚Šåˆ¤å®š
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
 
@@ -46,19 +46,19 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// ˆÚ“®
+	// ç§»å‹•
 	void InputMove(const FInputActionValue& value);
 
-	// UŒ‚
+	// æ”»æ’ƒ
 	void InputAttack(const FInputActionValue& value);
 
-	// ƒWƒƒƒ“ƒv
+	// ã‚¸ãƒ£ãƒ³ãƒ—
 	void InputJump(const FInputActionValue& value);
 
-	// ”­Ë
+	// ç™ºå°„
 	void FireBullet();
 
-	// UŒ‚I—¹
+	// æ”»æ’ƒçµ‚äº†
 	void EndAttack();
 
 	void EndDamage();
@@ -75,6 +75,7 @@ private:
 	void EndInvisible();
 	void SetVisible(bool visible);
 	void FlipVisible();
+	void StartDead();
 	void EndDead();
 	bool IsControll();
 

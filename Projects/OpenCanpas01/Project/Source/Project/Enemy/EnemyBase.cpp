@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "EnemyBase.h"
@@ -37,7 +37,7 @@ void AEnemyBase::Tick(float DeltaTime)
 
 	if (!m_IsStart && m_Player)
 	{
-		// ƒvƒŒƒCƒ„[‚ª‚ ‚é’ö“x‹ß‚Ã‚¢‚½‚ç“®‚«o‚·
+		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã‚ã‚‹ç¨‹åº¦è¿‘ã¥ã„ãŸã‚‰å‹•ãå‡ºã™
 		float dist = FVector::Dist(GetActorLocation(), m_Player->GetActorLocation());
 		if (dist <= m_StartDistance)
 		{
@@ -47,22 +47,25 @@ void AEnemyBase::Tick(float DeltaTime)
 }
 
 /// <summary>
-/// ƒŠƒXƒ|[ƒ“ˆ—
+/// ãƒªã‚¹ãƒãƒ¼ãƒ³å‡¦ç†
 /// </summary>
 void AEnemyBase::Respawn()
 {
-	// HPÄİ’è
+	// HPå†è¨­å®š
 	m_HP = m_MaxHP;
 
-	// ƒAƒNƒeƒBƒu‚Æ•\¦
+	// ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã¨è¡¨ç¤º
 	m_IsActive = true;
 	SetVisible(true);
+
+	// å¾…æ©Ÿ
+	m_IsStart = false;
 
 	SetActorTransform(m_RespawnTransform);
 }
 
 /// <summary>
-/// ƒI[ƒo[ƒ‰ƒbƒvÕ“Ëˆ—
+/// ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ—è¡çªå‡¦ç†
 /// </summary>
 /// <param name="otherActor"></param>
 /// <param name="otherComp"></param>
@@ -70,7 +73,7 @@ void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp
 {
 	if (IsDead())return;
 
-	// ƒvƒŒƒCƒ„[‚Ì’eŠÛ‚É“–‚½‚Á‚½
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¼¾ä¸¸ã«å½“ãŸã£ãŸ
 	if (otherActor->IsA(ABulletBase::StaticClass()))
 	{
 		ABulletBase* bullet = Cast<ABulletBase>(otherActor);
@@ -79,7 +82,7 @@ void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp
 			StartHitStop();
 			BeginDamage(bullet->GetDamage());
 
-			// ‚Á”ò‚Î‚µ‚Ég—p‚·‚éƒxƒNƒgƒ‹
+			// å¹ã£é£›ã°ã—ã«ä½¿ç”¨ã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
 			m_LaunchVec = GetActorLocation() - otherActor->GetActorLocation();
 			m_LaunchVec.Normalize();
 		}
@@ -87,21 +90,21 @@ void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp
 }
 
 /// <summary>
-/// ƒ_ƒ[ƒWŠJn
+/// ãƒ€ãƒ¡ãƒ¼ã‚¸é–‹å§‹
 /// </summary>
-/// <param name="value">ƒ_ƒ[ƒW—Ê</param>
+/// <param name="value">ãƒ€ãƒ¡ãƒ¼ã‚¸é‡</param>
 void AEnemyBase::BeginDamage(int value)
 {
 	m_IsDamage = true;
 	m_IsAttack = false;
 	m_HP -= value;
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“‚ğƒ‚ƒ“ƒ^[ƒWƒ…‚©‚çÄ¶
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ãƒ¢ãƒ³ã‚¿ãƒ¼ã‚¸ãƒ¥ã‹ã‚‰å†ç”Ÿ
 	PlayMontage(m_DamageMontage);
 }
 
 /// <summary>
-/// ƒ_ƒ[ƒWI—¹
+/// ãƒ€ãƒ¡ãƒ¼ã‚¸çµ‚äº†
 /// </summary>
 void AEnemyBase::EndDamage()
 {
@@ -109,7 +112,7 @@ void AEnemyBase::EndDamage()
 }
 
 /// <summary>
-/// ƒqƒbƒgƒXƒgƒbƒvŠJn
+/// ãƒ’ãƒƒãƒˆã‚¹ãƒˆãƒƒãƒ—é–‹å§‹
 /// </summary>
 void AEnemyBase::StartHitStop()
 {
@@ -118,13 +121,13 @@ void AEnemyBase::StartHitStop()
 }
 
 /// <summary>
-/// ƒqƒbƒgƒXƒgƒbƒvI—¹
+/// ãƒ’ãƒƒãƒˆã‚¹ãƒˆãƒƒãƒ—çµ‚äº†
 /// </summary>
 void AEnemyBase::EndHitStop()
 {
 	CustomTimeDilation = 1.0f;
 
-	// HP‚ª0ˆÈ‰º‚¾‚Á‚½‚ç€–S
+	// HPãŒ0ä»¥ä¸‹ã ã£ãŸã‚‰æ­»äº¡
 	if (m_HP <= 0)
 	{
 		Dead();
@@ -132,9 +135,9 @@ void AEnemyBase::EndHitStop()
 }
 
 /// <summary>
-/// UŒ‚ŠJn
+/// æ”»æ’ƒé–‹å§‹
 /// </summary>
-/// <param name="type">UŒ‚ƒ^ƒCƒv</param>
+/// <param name="type">æ”»æ’ƒã‚¿ã‚¤ãƒ—</param>
 void AEnemyBase::Attack(EEnemyAttackType type)
 {
 	switch (type)
@@ -146,7 +149,7 @@ void AEnemyBase::Attack(EEnemyAttackType type)
 }
 
 /// <summary>
-/// UŒ‚I—¹
+/// æ”»æ’ƒçµ‚äº†
 /// </summary>
 void AEnemyBase::EndAttack()
 {
@@ -154,9 +157,9 @@ void AEnemyBase::EndAttack()
 }
 
 /// <summary>
-/// ƒAƒjƒ[ƒVƒ‡ƒ“ƒ‚ƒ“ƒ^[ƒWƒ…‚ğÄ¶‚·‚é
+/// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ¢ãƒ³ã‚¿ãƒ¼ã‚¸ãƒ¥ã‚’å†ç”Ÿã™ã‚‹
 /// </summary>
-/// <param name="montage">Ä¶‚·‚éƒ‚ƒ“ƒ^[ƒWƒ…</param>
+/// <param name="montage">å†ç”Ÿã™ã‚‹ãƒ¢ãƒ³ã‚¿ãƒ¼ã‚¸ãƒ¥</param>
 void AEnemyBase::PlayMontage(UAnimMontage* montage)
 {
 	if (montage && GetMesh())
@@ -170,7 +173,7 @@ void AEnemyBase::PlayMontage(UAnimMontage* montage)
 }
 
 /// <summary>
-/// •\¦/”ñ•\¦İ’è
+/// è¡¨ç¤º/éè¡¨ç¤ºè¨­å®š
 /// </summary>
 /// <param name="visible"></param>
 void AEnemyBase::SetVisible(bool visible)
@@ -183,38 +186,38 @@ void AEnemyBase::SetVisible(bool visible)
 }
 
 /// <summary>
-/// €–Sˆ—
+/// æ­»äº¡å‡¦ç†
 /// </summary>
 void AEnemyBase::Dead()
 {
-	// ‚Ó‚Á‚Æ‚Î‚µƒxƒNƒgƒ‹
+	// ãµã£ã¨ã°ã—ãƒ™ã‚¯ãƒˆãƒ«
 	FVector vec = m_LaunchVec * 1000.0f;
 
-	// ’n–Ê‚É‚¢‚Ä‰ºŒü‚«‚É‚Á”ò‚Ôê‡‚ÍãŒü‚«‚É‚Á”ò‚Î‚·
+	// åœ°é¢ã«ã„ã¦ä¸‹å‘ãã«å¹ã£é£›ã¶å ´åˆã¯ä¸Šå‘ãã«å¹ã£é£›ã°ã™
 	if (GetCharacterMovement()->IsMovingOnGround() && vec.Z <= 0.0f)
 	{
 		vec.Z = 500.0f;
 	}
 
-	// ‚Á”ò‚Î‚·‚É‚ÍCharacterMovement‚ª•K—v‚È‚Ì‚ÅŠmÀ‚É•œŠˆ‚³‚¹‚é
+	// å¹ã£é£›ã°ã™ã«ã¯CharacterMovementãŒå¿…è¦ãªã®ã§ç¢ºå®Ÿã«å¾©æ´»ã•ã›ã‚‹
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
-	// ‡B‚Á”ò‚Î‚·
+	// â‘¢å¹ã£é£›ã°ã™
 	LaunchCharacter(vec, true, true);
 
-	// ˆê’èŠÔŒã‚ÉI—¹AÁ–Å
+	// ä¸€å®šæ™‚é–“å¾Œã«çµ‚äº†ã€æ¶ˆæ»…
 	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::Fin, 0.4f, false);
 }
 
 /// <summary>
-/// I—¹ˆ—
+/// çµ‚äº†å‡¦ç†
 /// </summary>
 void AEnemyBase::Fin()
 {
-	// €–SƒGƒtƒFƒNƒg
+	// æ­»äº¡ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DeadEffect, GetActorLocation(), FRotator::ZeroRotator, GetActorScale());
 
-	// ”ñƒAƒNƒeƒBƒu‚Æ”ñ•\¦
+	// éã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã¨éè¡¨ç¤º
 	m_IsActive = false;
 	SetVisible(false);
 }
