@@ -1,0 +1,96 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "CharacterPlayer.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "../Bullet/NormalBullet.h"
+#include "../Bullet/BulletManager.h"
+#include "../MainGameInstance/MainGameInstance.h"
+
+// Sets default values
+ACharacterPlayer::ACharacterPlayer()
+{
+ 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+}
+
+// Called when the game starts or when spawned
+void ACharacterPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// インプットマップを設定
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (PlayerController)
+	{
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		if (Subsystem)
+		{
+			Subsystem->AddMappingContext(m_InputMap, 0);
+		}
+	}
+}
+
+// Called every frame
+void ACharacterPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+// Called to bind functionality to input
+void ACharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	// 入力アクションを設定
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+
+		// ジャンプ
+		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(m_JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+		// 移動
+		EnhancedInputComponent->BindAction(m_MoveAction, ETriggerEvent::Triggered, this, &ACharacterPlayer::InputMove);
+
+		// 弾丸発射
+		EnhancedInputComponent->BindAction(m_FireBulletAction, ETriggerEvent::Started, this, &ACharacterPlayer::InputFireBullet);
+	}
+}
+
+/// <summary>
+/// 入力移動処理
+/// </summary>
+/// <param name="value">入力値(FVector2D)</param>
+void ACharacterPlayer::InputMove(const FInputActionValue& value)
+{
+	// アナログスティックの入力を取得
+	FVector2D inputVec = value.Get<FVector2D>();
+
+	// アナログスティックの座標系をUEの3D座標系に変換
+	FVector moveVec(inputVec.Y, inputVec.X, 0.0f);
+
+	// 移動
+	AddMovementInput(moveVec, m_MoveSpeed);
+}
+
+/// <summary>
+/// 弾丸発射処理
+/// </summary>
+/// <param name="value">入力値(bool)</param>
+void ACharacterPlayer::InputFireBullet(const FInputActionValue& value)
+{
+	// GameInstanceからBulletManagerを取得
+	UMainGameInstance* gameInstance = Cast<UMainGameInstance>(GetGameInstance());
+	UBulletManager* bulletManager = gameInstance->GetBulletManager();
+
+	if (bulletManager)
+	{
+		// BulletManagerから弾丸を発射
+		FVector pos = GetActorLocation();
+		FRotator rot = GetActorRotation();
+		bulletManager->FireBullet(m_NormalBullet, pos, rot);
+	}
+}
