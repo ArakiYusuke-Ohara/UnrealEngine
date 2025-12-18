@@ -37,8 +37,9 @@ void ATestMap::Tick(float DeltaTime)
 	// プレイヤーが死亡したら一定時間後にフェードアウト
 	if (m_State == PlayMapState::PLAY && m_Player->IsDead())
 	{
+		float waitTime = m_Player->IsFallingDead() ? 0.1f : 3.0f;
 		m_State = PlayMapState::PLAYER_DEAD;
-		GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &ATestMap::FadeOut, 3.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &ATestMap::FadeOut, waitTime, false);
 	}
 }
 

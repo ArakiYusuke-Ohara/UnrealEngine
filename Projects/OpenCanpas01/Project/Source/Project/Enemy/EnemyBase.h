@@ -30,8 +30,6 @@ public:
 
 	virtual void Respawn();
 
-	UEnemyManager* GetEnemyManager();
-
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
 

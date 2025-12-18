@@ -21,6 +21,8 @@ AMagician::AMagician()
 	m_IsAttack = false;
 	m_IsDamage = false;
 	m_IsInvincible = false;
+	m_IsDead = false;
+	m_IsFallingDead = false;
 	m_InvisibleTime = 0.0f;
 }
 
@@ -53,8 +55,9 @@ void AMagician::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 落下死判定
-	if (m_IsDead == false && GetActorLocation().Z <= -1000.0f)
+	if (m_IsDead == false && GetActorLocation().Z <= -500.0f)
 	{
+		m_IsFallingDead = true;
 		StartDead();
 	}
 }
@@ -324,7 +327,8 @@ void AMagician::StartDead()
 {
 	m_IsDead = true;
 	// 一定時間後に死亡終了処理
-	GetWorld()->GetTimerManager().SetTimer(m_DeadTimerHandle, this, &AMagician::EndDead, 2.0f, false);
+	float waitTime = m_IsFallingDead ? 0.1f : 2.0f;
+	GetWorld()->GetTimerManager().SetTimer(m_DeadTimerHandle, this, &AMagician::EndDead, waitTime, false);
 }
 
 /// <summary>
@@ -336,7 +340,7 @@ void AMagician::EndDead()
 	SetVisible(false);
 
 	// 死亡エフェクト
-	if (m_DeadEffect)
+	if (m_DeadEffect && !m_IsFallingDead)
 	{
 		if (GetMesh()->DoesSocketExist(FName("spine_02")))
 		{
@@ -353,6 +357,7 @@ void AMagician::Respawn()
 {
 	// 死亡は解除する
 	m_IsDead = false;
+	m_IsFallingDead = false;
 
 	// HP再設定
 	m_HP = m_MaxHP;

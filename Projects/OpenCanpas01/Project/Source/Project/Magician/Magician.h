@@ -35,6 +35,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Dead")
 	bool IsDead() const { return m_IsDead; }
 
+	bool IsFallingDead() const { return m_IsFallingDead; }
+
 	// 当たり判定
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
@@ -121,6 +123,7 @@ private:
 	bool m_IsDamage;
 	bool m_IsInvincible;
 	bool m_IsDead;
+	bool m_IsFallingDead;
 	int m_HP;
 	FVector2D m_InputVec;
 	FVector m_LaunchVec;

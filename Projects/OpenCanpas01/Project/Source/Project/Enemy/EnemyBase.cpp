@@ -5,6 +5,7 @@
 #include "EnemyManager.h"
 #include "../Bullet/MagicianBullet.h"
 #include "../Magician/Magician.h"
+#include "../Levels/Play/PlayCounter.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,7 +31,8 @@ void AEnemyBase::BeginPlay()
 	ACharacter* player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	m_Player = Cast<AMagician>(player);
 
-	GetEnemyManager()->RegisterEnemy(this);
+	GetWorld()->GetSubsystem<UEnemyManager>()->RegisterEnemy(this);
+	GetWorld()->GetSubsystem<UPlayCounter>()->RegisterEnemy();
 }
 
 // Called every frame
@@ -65,17 +67,6 @@ void AEnemyBase::Respawn()
 	m_IsStart = false;
 
 	SetActorTransform(m_RespawnTransform);
-}
-
-UEnemyManager* AEnemyBase::GetEnemyManager()
-{
-	UWorld* world = GetWorld();
-	if (world)
-	{
-		return world->GetSubsystem<UEnemyManager>();
-	}
-
-	return nullptr;
 }
 
 /// <summary>
@@ -218,6 +209,9 @@ void AEnemyBase::Dead()
 
 	// ③吹っ飛ばす
 	LaunchCharacter(vec, true, true);
+
+	// 倒した敵数カウント
+	GetWorld()->GetSubsystem<UPlayCounter>()->AddKill();
 
 	// 一定時間後に終了、消滅
 	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::Fin, 0.4f, false);
