@@ -82,10 +82,8 @@ void ACharacterPlayer::InputMove(const FInputActionValue& value)
 /// <param name="value">“ü—Í’l(bool)</param>
 void ACharacterPlayer::InputFireBullet(const FInputActionValue& value)
 {
-	// GameInstance‚©‚çBulletManager‚ðŽæ“¾
-	UMainGameInstance* gameInstance = Cast<UMainGameInstance>(GetGameInstance());
-	UBulletManager* bulletManager = gameInstance->GetBulletManager();
-
+	// BulletManager‚ðŽæ“¾
+	UBulletManager* bulletManager = GetWorld()->GetSubsystem<UBulletManager>();
 	if (bulletManager)
 	{
 		// BulletManager‚©‚ç’eŠÛ‚ð”­ŽË

@@ -7,8 +7,10 @@
 ANormalBullet* UBulletManager::FireBullet(TSubclassOf<ANormalBullet> fireBullet, FVector pos, FRotator rot)
 {
 	// ”z—ñ‚Ì’†‚©‚çŽg‚Á‚Ä‚È‚¢’eŠÛ‚ð’T‚·
-	for (ANormalBullet* bullet : m_Bullets)
+	for (auto &bullet : m_Bullets)
 	{
+		if (!bullet.IsValid()) continue;
+
 		// “¯‚¶ƒ^ƒCƒv‚Ì’eŠÛ‚©
 		if (bullet->IsA(fireBullet))
 		{
@@ -17,7 +19,7 @@ ANormalBullet* UBulletManager::FireBullet(TSubclassOf<ANormalBullet> fireBullet,
 			{
 				// Ä—˜—p‚µ‚Ä”­ŽË
 				bullet->Fire(pos, rot);
-				return bullet;
+				return bullet.Get();
 			}
 		}
 	}
@@ -31,3 +33,5 @@ ANormalBullet* UBulletManager::FireBullet(TSubclassOf<ANormalBullet> fireBullet,
 
 	return bullet;
 }
+
+

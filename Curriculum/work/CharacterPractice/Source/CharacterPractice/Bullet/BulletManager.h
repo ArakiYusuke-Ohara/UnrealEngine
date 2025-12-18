@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/GameInstance.h"
 #include "Containers/Array.h"
-#include "BulletParameter.h"
+#include "Subsystems/WorldSubsystem.h"
 #include "BulletManager.generated.h"
 
 class ANormalBullet;
@@ -14,7 +13,7 @@ class ANormalBullet;
  * 
  */
 UCLASS()
-class CHARACTERPRACTICE_API UBulletManager : public UObject
+class CHARACTERPRACTICE_API UBulletManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
 	
@@ -22,7 +21,7 @@ public:
 	ANormalBullet* FireBullet(TSubclassOf<ANormalBullet> fireBullet, FVector pos, FRotator rot);
 
 private:
-	TArray<ANormalBullet*> m_Bullets;
+	TArray<TWeakObjectPtr<ANormalBullet>> m_Bullets;
 };
 
 
