@@ -2,6 +2,7 @@
 
 
 #include "EnemyBase.h"
+#include "EnemyManager.h"
 #include "../Bullet/MagicianBullet.h"
 #include "../Magician/Magician.h"
 #include "NiagaraFunctionLibrary.h"
@@ -28,6 +29,8 @@ void AEnemyBase::BeginPlay()
 	m_HP = m_MaxHP;
 	ACharacter* player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	m_Player = Cast<AMagician>(player);
+
+	GetEnemyManager()->RegisterEnemy(this);
 }
 
 // Called every frame
@@ -62,6 +65,17 @@ void AEnemyBase::Respawn()
 	m_IsStart = false;
 
 	SetActorTransform(m_RespawnTransform);
+}
+
+UEnemyManager* AEnemyBase::GetEnemyManager()
+{
+	UWorld* world = GetWorld();
+	if (world)
+	{
+		return world->GetSubsystem<UEnemyManager>();
+	}
+
+	return nullptr;
 }
 
 /// <summary>

@@ -7,6 +7,8 @@
 #include "NiagaraComponent.h"
 #include "ItemBase.generated.h"
 
+class UItemManager;
+
 UCLASS()
 class PROJECT_API AItemBase : public AActor
 {
@@ -24,6 +26,8 @@ protected:
 
 	void SetVisible(bool visible);
 	void Disable();
+
+	UItemManager* GetItemManager();
 
 public:	
 	// Called every frame

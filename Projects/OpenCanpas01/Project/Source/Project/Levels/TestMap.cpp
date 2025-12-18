@@ -66,10 +66,12 @@ void ATestMap::Restart()
 	m_Player->Respawn();
 
 	// エネミーをリスポーン
-	AEnemyManager::GetInstance(GetWorld())->RespawnAllEnemy();
+	UEnemyManager* enemyManager = GetWorld()->GetSubsystem<UEnemyManager>();
+	if (enemyManager) enemyManager->RespawnAllEnemy();
 
 	// アイテムをリスポーン
-	AItemManager::GetInstance(GetWorld())->RespawnAllItem();
+	UItemManager* itemManager = GetWorld()->GetSubsystem<UItemManager>();
+	if (itemManager) itemManager->RespawnAllItem();
 
 	// フェードイン
 	APlayerController* playerController = GetWorld()->GetFirstPlayerController();

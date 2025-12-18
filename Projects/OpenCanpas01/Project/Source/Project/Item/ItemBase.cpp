@@ -2,6 +2,7 @@
 
 
 #include "ItemBase.h"
+#include "ItemManager.h"
 #include "../Magician/Magician.h"
 #include "NiagaraFunctionLibrary.h"
 
@@ -18,6 +19,12 @@ void AItemBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	UItemManager* itemManager = GetWorld()->GetSubsystem<UItemManager>();
+	if (itemManager)
+	{
+		itemManager->RegisterItem(this);
+	}
+
 	m_RespawnTransform = GetActorTransform();
 	m_IsActive = true;
 }
@@ -89,4 +96,15 @@ void AItemBase::Disable()
 {
 	m_IsActive = false;
 	SetVisible(false);
+}
+
+UItemManager* AItemBase::GetItemManager()
+{
+	UWorld* world = GetWorld();
+	if (world)
+	{
+		return world->GetSubsystem<UItemManager>();
+	}
+
+	return nullptr;
 }

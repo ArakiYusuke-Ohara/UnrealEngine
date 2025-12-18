@@ -9,6 +9,7 @@
 #include "EnemyBase.generated.h"
 
 class AMagician;
+class UEnemyManager;
 
 UCLASS()
 class PROJECT_API AEnemyBase : public ACharacter
@@ -29,13 +30,17 @@ public:
 
 	virtual void Respawn();
 
+	UEnemyManager* GetEnemyManager();
+
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsDamage() const { return m_IsDamage; }
+
 	UFUNCTION(BlueprintCallable)
 	bool IsAttack() const { return m_IsAttack; }
+
 	bool IsActive() const { return m_IsActive; }
 	bool IsDead() const { return m_HP <= 0; }
 
