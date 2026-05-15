@@ -35,6 +35,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Dead")
 	bool IsDead() const { return m_IsDead; }
 
+	bool IsRetry() const { return m_IsRetry; }
 	bool IsFallingDead() const { return m_IsFallingDead; }
 
 	// 当たり判定
@@ -119,11 +120,16 @@ private:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* m_DeadEffect;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* m_JumpSE;
+
 	bool m_IsAttack;
 	bool m_IsDamage;
 	bool m_IsInvincible;
 	bool m_IsDead;
 	bool m_IsFallingDead;
+	bool m_IsGoal;
+	bool m_IsRetry;
 	int m_HP;
 	FVector2D m_InputVec;
 	FVector m_LaunchVec;

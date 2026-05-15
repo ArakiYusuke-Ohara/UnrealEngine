@@ -41,6 +41,7 @@ void AMagicianBullet::Disable()
 	}
 	if (m_EndEffect)
 	{
+		// èIóπââèo
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_EndEffect, GetActorLocation());
 	}
 }

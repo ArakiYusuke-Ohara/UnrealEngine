@@ -3,7 +3,9 @@
 
 #include "Goal.h"
 #include "../../Magician/Magician.h"
-#include"Kismet/GameplayStatics.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
+
 // Sets default values
 AGoal::AGoal()
 {
@@ -36,6 +38,9 @@ void AGoal::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 	// プレイヤーが当たったらゴール
 	if (otherActor->IsA(AMagician::StaticClass()))
 	{
-
+		if (m_ClearUI)
+		{
+			m_ClearUI->AddToViewport();
+		}
 	}
 }

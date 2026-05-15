@@ -2,7 +2,6 @@
 
 
 #include "TestMap.h"
-#include "../GameInstance/MyGameInstance.h"
 #include "../Magician/Magician.h"
 #include "../Enemy/EnemyManager.h"
 #include "../Item/ItemManager.h"
@@ -21,10 +20,7 @@ void ATestMap::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	UMyGameInstance* gameInstance = Cast<UMyGameInstance>(GetGameInstance());
-	gameInstance->CreateBulletManager();
-
-	m_State = PlayMapState::PLAY;
+	m_State = TestMapState::PLAY;
 
 	m_Player = Cast<AMagician>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 }
@@ -35,17 +31,17 @@ void ATestMap::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// プレイヤーが死亡したら一定時間後にフェードアウト
-	if (m_State == PlayMapState::PLAY && m_Player->IsDead())
+	if (m_State == TestMapState::PLAY && m_Player->IsDead())
 	{
 		float waitTime = m_Player->IsFallingDead() ? 0.1f : 3.0f;
-		m_State = PlayMapState::PLAYER_DEAD;
+		m_State = TestMapState::PLAYER_DEAD;
 		GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &ATestMap::FadeOut, waitTime, false);
 	}
 }
 
 void ATestMap::FadeOut()
 {
-	m_State = PlayMapState::FADE_OUT;
+	m_State = TestMapState::FADE_OUT;
 
 	// フェードアウト
 	APlayerController* playerController = GetWorld()->GetFirstPlayerController();
@@ -61,7 +57,7 @@ void ATestMap::FadeOut()
 
 void ATestMap::Restart()
 {
-	m_State = PlayMapState::PLAY;
+	m_State = TestMapState::PLAY;
 
 	// プレイヤーをリスポーン
 	m_Player->Respawn();
@@ -86,11 +82,4 @@ void ATestMap::Restart()
 void ATestMap::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-
-	UMyGameInstance* gameInstance = Cast<UMyGameInstance>(GetGameInstance());
-
-	if (gameInstance)
-	{
-		gameInstance->DeleteBulletManager();
-	}
 }

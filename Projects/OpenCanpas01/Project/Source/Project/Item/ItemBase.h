@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* m_GetEffect;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* m_GetSE;
+
 	bool m_IsActive;
 	FTransform m_RespawnTransform;
 };

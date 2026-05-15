@@ -9,6 +9,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "../Audio/AudioManager.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -222,8 +223,10 @@ void AEnemyBase::Dead()
 /// </summary>
 void AEnemyBase::Fin()
 {
-	// 死亡エフェクト
+	// 死亡演出
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DeadEffect, GetActorLocation(), FRotator::ZeroRotator, GetActorScale());
+	UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+	audio->PlaySE(m_DeadSE, GetActorLocation());
 
 	// 非アクティブと非表示
 	m_IsActive = false;

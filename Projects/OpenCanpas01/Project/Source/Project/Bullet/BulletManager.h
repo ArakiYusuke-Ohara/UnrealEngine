@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/GameInstance.h"
+#include "Subsystems/WorldSubsystem.h"
 #include "Containers/Array.h"
 #include "BulletManager.generated.h"
 
@@ -13,7 +13,7 @@ class ABulletBase;
  * 
  */
 UCLASS()
-class PROJECT_API UBulletManager : public UObject
+class PROJECT_API UBulletManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
 

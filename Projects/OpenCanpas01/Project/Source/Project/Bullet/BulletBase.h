@@ -60,6 +60,16 @@ protected:
 	UPROPERTY(EditAnywhere)
 	EBulletOwner m_OwnerType;
 
+	// î≠éÀâπ
+	UPROPERTY(EditAnywhere)
+	USoundBase* m_FireSE;
+	// ñΩíÜâπ
+	UPROPERTY(EditAnywhere)
+	USoundBase* m_HitSE;
+	// èIóπâπ
+	UPROPERTY(EditAnywhere)
+	USoundBase* m_EndSE;
+
 	bool m_Active;
 	float m_NowLife;
 	float m_CoolTime;

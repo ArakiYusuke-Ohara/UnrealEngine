@@ -5,6 +5,7 @@
 #include "ItemManager.h"
 #include "../Magician/Magician.h"
 #include "NiagaraFunctionLibrary.h"
+#include "../Audio/AudioManager.h"
 
 // Sets default values
 AItemBase::AItemBase()
@@ -65,8 +66,10 @@ void AItemBase::Respawn()
 /// </summary>
 void AItemBase::Taked()
 {
-	// ゲットエフェクト
+	// ゲット演出
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_GetEffect, GetActorLocation());
+	UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+	audio->PlaySE(m_GetSE, GetActorLocation());
 
 	// 取られたので無効化
 	Disable();

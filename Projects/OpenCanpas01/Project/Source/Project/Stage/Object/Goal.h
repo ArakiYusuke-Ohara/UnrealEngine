@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Goal.generated.h"
 
+class UUserWidget;
+
 UCLASS()
 class PROJECT_API AGoal : public AActor
 {
@@ -26,4 +28,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp);
 
+	UPROPERTY(EditAnywhere)
+	UUserWidget* m_ClearUI;
 };

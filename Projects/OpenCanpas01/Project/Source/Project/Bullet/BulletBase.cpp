@@ -6,6 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "../Enemy/EnemyBase.h"
 #include "../Magician/Magician.h"
+#include "../Audio/AudioManager.h"
 
 // Sets default values
 ABulletBase::ABulletBase()
@@ -46,6 +47,8 @@ void ABulletBase::Fire(FVector pos, FRotator rot)
 	SetActorRotation(rot);
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
+	UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+	audio->PlaySE(m_FireSE, pos);
 }
 
 void ABulletBase::Disable()
@@ -54,6 +57,8 @@ void ABulletBase::Disable()
 	m_CoolTime = BULLET_COOL_TIME;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+	UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+	audio->PlaySE(m_EndSE, GetActorLocation());
 }
 
 void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp, const FHitResult& hit)
@@ -67,10 +72,13 @@ void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherCom
 			AEnemyBase* enemy = Cast<AEnemyBase>(otherActor);
 			if (!enemy->IsDead())
 			{
+				FVector pos = GetActorLocation();
 				FVector otherPos = otherActor->GetActorLocation();
-				FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
-				// ヒットエフェクト
+				FVector hitEffectPos = (pos + otherPos) / 2.0f;
+				// ヒット演出
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
+				UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+				audio->PlaySE(m_HitSE, pos);
 
 				Disable();
 			}

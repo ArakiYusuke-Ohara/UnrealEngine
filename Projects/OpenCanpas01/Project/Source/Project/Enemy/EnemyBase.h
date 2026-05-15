@@ -82,6 +82,9 @@ protected:
 	UNiagaraSystem* m_DeadEffect;
 
 	UPROPERTY(EditAnywhere)
+	USoundBase* m_DeadSE;
+
+	UPROPERTY(EditAnywhere)
 	float m_StartDistance;
 
 	UPROPERTY(EditAnywhere)

@@ -4,7 +4,6 @@
 #include "EnemyBeholder.h"
 #include "../Bullet/BulletManager.h"
 #include "../Bullet/MagicianBullet.h"
-#include "../GameInstance/MyGameInstance.h"
 
 // Called when the game starts or when spawned
 void AEnemyBeholder::BeginPlay()
@@ -49,8 +48,7 @@ void AEnemyBeholder::AttackA()
 {
 	if (m_Bullet)
 	{
-		UMyGameInstance* gameInstance = Cast<UMyGameInstance>(GetGameInstance());
-		UBulletManager* bulletManager = gameInstance->GetBulletManager();
+		UBulletManager* bulletManager = GetWorld()->GetSubsystem<UBulletManager>();
 		if (bulletManager)
 		{
 			bulletManager->FireBullet(m_Bullet, GetActorLocation(), GetActorRotation());
