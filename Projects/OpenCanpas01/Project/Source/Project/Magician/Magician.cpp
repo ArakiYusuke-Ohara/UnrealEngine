@@ -236,6 +236,8 @@ void AMagician::HitDamageObject(AActor* otherActor, UPrimitiveComponent* otherCo
 /// </summary>
 void AMagician::Damage()
 {
+	m_IsAttack = false;
+
 	// ダメージエフェクト
 	if (m_DamageEffect)
 	{
@@ -374,6 +376,7 @@ void AMagician::Respawn()
 	m_IsFallingDead = false;
 	m_IsGoal = false;
 	m_IsRetry = false;
+	m_IsAttack = false;
 
 	// HP再設定
 	m_HP = m_MaxHP;

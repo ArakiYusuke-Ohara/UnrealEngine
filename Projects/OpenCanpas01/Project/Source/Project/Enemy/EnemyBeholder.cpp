@@ -2,6 +2,7 @@
 
 
 #include "EnemyBeholder.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "../Bullet/BulletManager.h"
 #include "../Bullet/MagicianBullet.h"
 
@@ -54,4 +55,11 @@ void AEnemyBeholder::AttackA()
 			bulletManager->FireBullet(m_Bullet, GetActorLocation(), GetActorRotation());
 		}
 	}
+}
+
+void AEnemyBeholder::Respawn()
+{
+	Super::Respawn();
+
+	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 }

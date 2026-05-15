@@ -31,7 +31,9 @@ ABulletBase* UBulletManager::FireBullet(TSubclassOf<ABulletBase> fireBullet, FVe
 	}
 
 	// 全て使用済みであれば新しく生成して発射
-	ABulletBase* bullet = GetWorld()->SpawnActor<ABulletBase>(fireBullet);
+//	ABulletBase* bullet = GetWorld()->SpawnActor<ABulletBase>(fireBullet);
+	ABulletBase* bullet = GetWorld()->SpawnActor<ABulletBase>(fireBullet, pos, rot);
+
 	bullet->Fire(pos, rot);
 
 	// 配列に追加

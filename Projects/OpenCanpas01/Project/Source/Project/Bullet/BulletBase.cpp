@@ -63,45 +63,6 @@ void ABulletBase::Disable()
 
 void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp, const FHitResult& hit)
 {
-	// プレイヤーが撃った弾のヒット処理
-	if (m_OwnerType == EBulletOwner::Player)
-	{
-		// 敵に当たったら消える
-		if (otherActor && otherActor->IsA(AEnemyBase::StaticClass()))
-		{
-			AEnemyBase* enemy = Cast<AEnemyBase>(otherActor);
-			if (!enemy->IsDead())
-			{
-				FVector pos = GetActorLocation();
-				FVector otherPos = otherActor->GetActorLocation();
-				FVector hitEffectPos = (pos + otherPos) / 2.0f;
-				// ヒット演出
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
-				UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
-				audio->PlaySE(m_HitSE, pos);
-
-				Disable();
-			}
-		}
-	}
-	// 敵が撃った弾のヒット処理
-	else if (m_OwnerType == EBulletOwner::Enemy)
-	{
-		// プレイヤーに当たったら消える
-		if (otherActor && otherActor->IsA(AMagician::StaticClass()))
-		{
-			AMagician* magician = Cast<AMagician>(otherActor);
-			if (!magician->IsDead())
-			{
-				FVector otherPos = otherActor->GetActorLocation();
-				FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
-				// ヒットエフェクト
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
-
-				Disable();
-			}
-		}
-	}
 }
 
 void ABulletBase::OnHit(AActor* hitActor)

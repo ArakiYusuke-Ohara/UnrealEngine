@@ -66,9 +66,6 @@ void AEnemyBase::Respawn()
 	// 待機
 	m_IsStart = false;
 
-	// 移動モードは無しに
-	GetCharacterMovement()->SetMovementMode(MOVE_None);
-
 	SetActorTransform(m_RespawnTransform);
 }
 
@@ -210,9 +207,9 @@ void AEnemyBase::Dead()
 		vec.Z = 500.0f;
 	}
 
-	// 吹っ飛ばすにはCharacterMovementが必要なので確実に復活させる
+	// 歩行モードにしないと吹っ飛ばせない
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	
+
 	// ③吹っ飛ばす
 	LaunchCharacter(vec, true, true);
 
