@@ -20,6 +20,9 @@ public:
 
 	void RespawnAllEnemy();
 
+	int GetEnemyMax() const { return m_EnemyMax; }
+
 private:
 	TArray<AEnemyBase*> m_EnemyList;
+	int m_EnemyMax;
 };

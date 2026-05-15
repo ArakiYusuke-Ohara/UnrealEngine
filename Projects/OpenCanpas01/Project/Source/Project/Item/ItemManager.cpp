@@ -5,12 +5,18 @@
 #include "ItemBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
+#include "ItemCoin.h"
 
 void UItemManager::RegisterItem(AItemBase* item)
 {
     if (item && !m_ItemList.Contains(item))
     {
         m_ItemList.Add(item);
+    }
+    // ƒRƒCƒ“‚Ì”‚Í”‚¦‚é
+    if (item->IsA(AItemCoin::StaticClass()))
+    {
+        m_CoinMax++;
     }
 }
 

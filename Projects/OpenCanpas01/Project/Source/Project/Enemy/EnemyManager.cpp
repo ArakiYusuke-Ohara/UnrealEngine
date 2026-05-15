@@ -11,6 +11,8 @@ void UEnemyManager::RegisterEnemy(AEnemyBase* enemy)
     if (enemy && !m_EnemyList.Contains(enemy))
     {
         m_EnemyList.Add(enemy);
+        // エネミーの数は数えておく
+        m_EnemyMax++;
     }
 }
 

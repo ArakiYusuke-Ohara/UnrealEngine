@@ -14,13 +14,15 @@ class PROJECT_API UItemManager : public UWorldSubsystem
 	GENERATED_BODY()
 	
 public:	
-	// “G‚Ì“o˜^‚Æ‰ğœ
+	// ƒAƒCƒeƒ€‚Ì“o˜^‚Æ‰ğœ
 	void RegisterItem(AItemBase* item);
 	void UnregisterItem(AItemBase* item);
 
 	void RespawnAllItem();
 
+	int GetCoinMax() const { return m_CoinMax; }
+
 private:
 	TArray<AItemBase*> m_ItemList;
-
+	int m_CoinMax;
 };

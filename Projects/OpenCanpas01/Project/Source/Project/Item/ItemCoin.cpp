@@ -8,9 +8,6 @@
 void AItemCoin::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// カウンターにコイン登録
-	GetWorld()->GetSubsystem<UPlayCounter>()->RegisterCoin();
 }
 
 // Called every frame

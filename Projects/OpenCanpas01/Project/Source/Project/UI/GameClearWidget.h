@@ -7,6 +7,7 @@
 #include "GameClearWidget.generated.h"
 
 class UTextBlock;
+class UOverlay;
 
 /**
  * 
@@ -15,10 +16,21 @@ UCLASS()
 class PROJECT_API UGameClearWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+protected:
+    virtual void NativeConstruct() override;
+
+private:
     UPROPERTY(meta = (BindWidget))
-    UTextBlock* m_EnemyCountText;
+    UTextBlock* m_CoinLeft;
 
     UPROPERTY(meta = (BindWidget))
-    UTextBlock* m_CoinCountText;
+    UTextBlock* m_EnemyLeft;
+
+    UPROPERTY(meta = (BindWidget))
+    UOverlay* m_ClearOverlay;
+
+    UPROPERTY(meta = (BindWidget))
+    UOverlay* m_CompleteOverlay;
+
 };

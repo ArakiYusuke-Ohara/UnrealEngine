@@ -2,6 +2,7 @@
 
 
 #include "PlayLevel.h"
+#include "PlayCounter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "../../Audio/AudioManager.h"
@@ -82,6 +83,10 @@ void APlayLevel::Restart()
 	// アイテムをリスポーン
 	UItemManager* itemManager = GetWorld()->GetSubsystem<UItemManager>();
 	if (itemManager) itemManager->RespawnAllItem();
+
+	// カウンターをリセット
+	UPlayCounter* playCounter = GetWorld()->GetSubsystem<UPlayCounter>();
+	playCounter->ResetCounter();
 
 	// フェードイン
 	ALevelBase::FadeIn();

@@ -33,7 +33,6 @@ void AEnemyBase::BeginPlay()
 	m_Player = Cast<AMagician>(player);
 
 	GetWorld()->GetSubsystem<UEnemyManager>()->RegisterEnemy(this);
-	GetWorld()->GetSubsystem<UPlayCounter>()->RegisterEnemy();
 }
 
 // Called every frame
@@ -66,6 +65,9 @@ void AEnemyBase::Respawn()
 
 	// 待機
 	m_IsStart = false;
+
+	// 移動モードは無しに
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
 
 	SetActorTransform(m_RespawnTransform);
 }
@@ -210,12 +212,12 @@ void AEnemyBase::Dead()
 
 	// 吹っ飛ばすにはCharacterMovementが必要なので確実に復活させる
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-
+	
 	// ③吹っ飛ばす
 	LaunchCharacter(vec, true, true);
 
 	// 倒した敵数カウント
-	GetWorld()->GetSubsystem<UPlayCounter>()->AddKill();
+	GetWorld()->GetSubsystem<UPlayCounter>()->AddKillEnemy();
 
 	// 一定時間後に終了、消滅
 	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::Fin, 0.4f, false);
