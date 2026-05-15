@@ -91,6 +91,9 @@ void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp
 			// 吹っ飛ばしに使用するベクトル
 			m_LaunchVec = GetActorLocation() - otherActor->GetActorLocation();
 			m_LaunchVec.Normalize();
+
+			// バレット側のヒット処理
+			bullet->OnHit(this);
 		}
 	}
 }

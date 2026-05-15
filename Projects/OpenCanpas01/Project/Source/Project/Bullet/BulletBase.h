@@ -42,6 +42,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp, const FHitResult& hit);
+	virtual void OnHit(AActor* hitActor);
 
 private:
 	void PlayHitEffect();

@@ -424,6 +424,7 @@ void AMagician::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 		if (bullet->GetOwnerType() == EBulletOwner::Enemy)
 		{
 			HitDamageObject(otherActor, otherComp);
+			bullet->OnHit(this);
 		}
 	}
 	// ゴールに当たった

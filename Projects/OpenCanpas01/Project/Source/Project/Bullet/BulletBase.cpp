@@ -4,6 +4,7 @@
 
 #include "BulletBase.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/SphereComponent.h"
 #include "../Enemy/EnemyBase.h"
 #include "../Magician/Magician.h"
 #include "../Audio/AudioManager.h"
@@ -21,8 +22,7 @@ ABulletBase::ABulletBase()
 // Called when the game starts or when spawned
 void ABulletBase::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 }
 
 // Called every frame
@@ -102,6 +102,28 @@ void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherCom
 			}
 		}
 	}
+}
+
+void ABulletBase::OnHit(AActor* hitActor)
+{
+	// ヒットエフェクト
+	if (m_HitEffect)
+	{
+		FVector pos = GetActorLocation();
+		FVector otherPos = hitActor->GetActorLocation();
+		FVector hitEffectPos = (pos + otherPos) / 2.0f;
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
+	}
+	// ヒット音
+	if (m_HitSE)
+	{
+		FVector pos = GetActorLocation();
+		UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+		audio->PlaySE(m_HitSE, pos);
+	}
+
+	// あたったらなくなる
+	Disable();
 }
 
 void ABulletBase::PlayHitEffect()
