@@ -18,7 +18,9 @@ AEnemyBase::AEnemyBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	m_IsDamage = false;
-	m_HitStopTime = 0.1f;
+	m_HitStopTime = 0.2f;
+	m_ShakeDir = 1.0f;
+	m_ShakePower = 10.0f;
 }
 
 // Called when the game starts or when spawned
@@ -124,8 +126,16 @@ void AEnemyBase::EndDamage()
 /// </summary>
 void AEnemyBase::StartHitStop()
 {
+	// ストップ
 	CustomTimeDilation = 0.05f;
+	// 指定時間後にヒットストップ終了関数が呼ばれるようにする
 	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::EndHitStop, m_HitStopTime, false);
+
+	// 振動処理
+	// 振動の中心座標
+	m_ShakeBaseLocation = GetMesh()->GetRelativeLocation();
+	// 振動処理を指定時間呼び続ける
+	GetWorld()->GetTimerManager().SetTimer(m_ShakeTimerHandle, this, &AEnemyBase::Shake, 1.0f / 60.0f, true);
 }
 
 /// <summary>
@@ -133,7 +143,11 @@ void AEnemyBase::StartHitStop()
 /// </summary>
 void AEnemyBase::EndHitStop()
 {
+	// 動き始める
 	CustomTimeDilation = 1.0f;
+
+	// 振動終了
+	GetWorld()->GetTimerManager().ClearTimer(m_ShakeTimerHandle);
 
 	// HPが0以下だったら死亡
 	if (m_HP <= 0)
@@ -233,4 +247,10 @@ void AEnemyBase::Fin()
 	// 非アクティブと非表示
 	m_IsActive = false;
 	SetVisible(false);
+}
+
+void AEnemyBase::Shake()
+{
+	GetMesh()->SetRelativeLocation(m_ShakeBaseLocation + FVector(m_ShakeDir * m_ShakePower, 0.0f, 0.0f));
+	m_ShakeDir *= -1;
 }

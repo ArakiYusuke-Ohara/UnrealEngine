@@ -66,6 +66,8 @@ private:
 	virtual void AttackB() {}
 	virtual void AttackC() {}
 
+	void Shake();
+
 protected:
 	bool m_IsActive;
 	bool m_IsStart;
@@ -95,4 +97,10 @@ protected:
 	FTimerHandle m_TimerHandle;
 	FVector m_LaunchVec;
 	FTransform m_RespawnTransform;
+
+private:
+	int m_ShakeDir;
+	FVector m_ShakeBaseLocation;
+	FTimerHandle m_ShakeTimerHandle;
+	float m_ShakePower;
 };
