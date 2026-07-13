@@ -2,6 +2,13 @@
 
 
 #include "ItemCoin.h"
+#include "../Levels/Play/PlayCounter.h"
+
+// Called when the game starts or when spawned
+void AItemCoin::BeginPlay()
+{
+	Super::BeginPlay();
+}
 
 // Called every frame
 void AItemCoin::Tick(float DeltaTime)
@@ -16,4 +23,7 @@ void AItemCoin::Tick(float DeltaTime)
 void AItemCoin::Taked()
 {
 	Super::Taked();
+
+	// コイン獲得カウント
+	GetWorld()->GetSubsystem<UPlayCounter>()->AddCoin();
 }

@@ -10,6 +10,13 @@ void AEnemySwarm::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AEnemySwarm::Respawn()
+{
+	Super::Respawn();
+
+	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+}
+
 // Called every frame
 void AEnemySwarm::Tick(float DeltaTime)
 {

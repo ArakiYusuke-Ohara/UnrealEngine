@@ -4,8 +4,10 @@
 
 #include "BulletBase.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/SphereComponent.h"
 #include "../Enemy/EnemyBase.h"
 #include "../Magician/Magician.h"
+#include "../Audio/AudioManager.h"
 
 // Sets default values
 ABulletBase::ABulletBase()
@@ -20,8 +22,7 @@ ABulletBase::ABulletBase()
 // Called when the game starts or when spawned
 void ABulletBase::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 }
 
 // Called every frame
@@ -46,6 +47,8 @@ void ABulletBase::Fire(FVector pos, FRotator rot)
 	SetActorRotation(rot);
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
+	UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+	audio->PlaySE(m_FireSE, pos);
 }
 
 void ABulletBase::Disable()
@@ -54,46 +57,34 @@ void ABulletBase::Disable()
 	m_CoolTime = BULLET_COOL_TIME;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+	UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+	audio->PlaySE(m_EndSE, GetActorLocation());
 }
 
 void ABulletBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp, const FHitResult& hit)
 {
-	// プレイヤーが撃った弾のヒット処理
-	if (m_OwnerType == EBulletOwner::Player)
-	{
-		// 敵に当たったら消える
-		if (otherActor && otherActor->IsA(AEnemyBase::StaticClass()))
-		{
-			AEnemyBase* enemy = Cast<AEnemyBase>(otherActor);
-			if (!enemy->IsDead())
-			{
-				FVector otherPos = otherActor->GetActorLocation();
-				FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
-				// ヒットエフェクト
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
+}
 
-				Disable();
-			}
-		}
-	}
-	// 敵が撃った弾のヒット処理
-	else if (m_OwnerType == EBulletOwner::Enemy)
+void ABulletBase::OnHit(AActor* hitActor)
+{
+	// ヒットエフェクト
+	if (m_HitEffect)
 	{
-		// プレイヤーに当たったら消える
-		if (otherActor && otherActor->IsA(AMagician::StaticClass()))
-		{
-			AMagician* magician = Cast<AMagician>(otherActor);
-			if (!magician->IsDead())
-			{
-				FVector otherPos = otherActor->GetActorLocation();
-				FVector hitEffectPos = (GetActorLocation() + otherPos) / 2.0f;
-				// ヒットエフェクト
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
-
-				Disable();
-			}
-		}
+		FVector pos = GetActorLocation();
+		FVector otherPos = hitActor->GetActorLocation();
+		FVector hitEffectPos = (pos + otherPos) / 2.0f;
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_HitEffect, hitEffectPos);
 	}
+	// ヒット音
+	if (m_HitSE)
+	{
+		FVector pos = GetActorLocation();
+		UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+		audio->PlaySE(m_HitSE, pos);
+	}
+
+	// あたったらなくなる
+	Disable();
 }
 
 void ABulletBase::PlayHitEffect()

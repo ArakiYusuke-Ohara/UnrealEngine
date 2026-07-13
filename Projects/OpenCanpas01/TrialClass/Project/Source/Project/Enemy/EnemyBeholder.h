@@ -26,6 +26,8 @@ public:
 
 	virtual void AttackA() final;
 
+	void Respawn() override;
+
 private:
 	void StartAttack();
 

@@ -1,9 +1,11 @@
-ï»¿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ItemBase.h"
+#include "ItemManager.h"
 #include "../Magician/Magician.h"
 #include "NiagaraFunctionLibrary.h"
+#include "../Audio/AudioManager.h"
 
 // Sets default values
 AItemBase::AItemBase()
@@ -18,6 +20,9 @@ void AItemBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// ƒAƒCƒeƒ€‚ðƒ}ƒl[ƒWƒƒ[‚É“o˜^
+	GetWorld()->GetSubsystem<UItemManager>()->RegisterItem(this);
+
 	m_RespawnTransform = GetActorTransform();
 	m_IsActive = true;
 }
@@ -30,19 +35,19 @@ void AItemBase::Tick(float DeltaTime)
 }
 
 /// <summary>
-/// ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
-/// ä½•ã‹ãŒé‡ãªã£ãŸã¨ãã«å‡¦ç†ã•ã‚Œã‚‹
+/// ƒAƒCƒeƒ€‚ÌƒvƒƒOƒ‰ƒ€
+/// ‰½‚©‚ªd‚È‚Á‚½‚Æ‚«‚Éˆ—‚³‚ê‚é
 /// </summary>
-/// <param name="otherActor">é‡ãªã£ã¦ããŸã‚‚ã®</param>
-/// <param name="otherComp">é‡ãªã£ã¦ããŸã‚‚ã®ãŒæŒã¤ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ</param>
+/// <param name="otherActor">d‚È‚Á‚Ä‚«‚½‚à‚Ì</param>
+/// <param name="otherComp">d‚È‚Á‚Ä‚«‚½‚à‚Ì‚ªŽ‚ÂƒRƒ“ƒ|[ƒlƒ“ƒg</param>
 void AItemBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 {
 	if (!m_IsActive)return;
 
 	if (otherActor->IsA(AMagician::StaticClass()))
-	{ // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒé‡ãªã£ãŸ
+	{ // ƒvƒŒƒCƒ„[‚ªd‚È‚Á‚½
 		
-		// â‘ ã‚¢ã‚¤ãƒ†ãƒ ãŒå–ã‚‰ã‚ŒãŸï¼ï¼ 
+		// ‡@ƒAƒCƒeƒ€‚ªŽæ‚ç‚ê‚½II 
 
 	}
 }
@@ -51,25 +56,27 @@ void AItemBase::Respawn()
 {
 	SetActorTransform(m_RespawnTransform);
 
-	// ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã¨è¡¨ç¤º
+	// ƒAƒNƒeƒBƒu‚Æ•\Ž¦
 	m_IsActive = true;
 	SetVisible(true);
 }
 
 /// <summary>
-/// ã‚¢ã‚¤ãƒ†ãƒ ãŒå–ã‚‰ã‚ŒãŸ
+/// ƒAƒCƒeƒ€‚ªŽæ‚ç‚ê‚½
 /// </summary>
 void AItemBase::Taked()
 {
-	// ã‚²ãƒƒãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+	// ƒQƒbƒg‰‰o
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_GetEffect, GetActorLocation());
+	UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+	audio->PlaySE(m_GetSE, GetActorLocation());
 
-	// å–ã‚‰ã‚ŒãŸã®ã§ç„¡åŠ¹åŒ–
+	// Žæ‚ç‚ê‚½‚Ì‚Å–³Œø‰»
 	Disable();
 }
 
 /// <summary>
-/// è¡¨ç¤º/éžè¡¨ç¤ºè¨­å®š
+/// •\Ž¦/”ñ•\Ž¦Ý’è
 /// </summary>
 /// <param name="visible"></param>
 void AItemBase::SetVisible(bool visible)
@@ -82,8 +89,8 @@ void AItemBase::SetVisible(bool visible)
 }
 
 /// <summary>
-/// ç„¡åŠ¹åŒ–ã™ã‚‹
-/// éžè¡¨ç¤ºã¨ãªã‚Šä½•è€…ã¨ã‚‚å¹²æ¸‰ã—ãªããªã‚‹
+/// –³Œø‰»‚·‚é
+/// ”ñ•\Ž¦‚Æ‚È‚è‰½ŽÒ‚Æ‚àŠ±Â‚µ‚È‚­‚È‚é
 /// </summary>
 void AItemBase::Disable()
 {

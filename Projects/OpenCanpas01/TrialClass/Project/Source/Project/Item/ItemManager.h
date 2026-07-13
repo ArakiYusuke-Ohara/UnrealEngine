@@ -3,38 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Subsystems/WorldSubsystem.h"
 #include "ItemManager.generated.h"
 
 class AItemBase;
 
 UCLASS()
-class PROJECT_API AItemManager : public AActor
+class PROJECT_API UItemManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
-	AItemManager();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
-	static AItemManager* GetInstance(UWorld* world);
-
-	// “G‚Ì“o˜^‚Æ‰ğœ
+	// ƒAƒCƒeƒ€‚Ì“o˜^‚Æ‰ğœ
 	void RegisterItem(AItemBase* item);
 	void UnregisterItem(AItemBase* item);
 
 	void RespawnAllItem();
 
+	int GetCoinMax() const { return m_CoinMax; }
+
 private:
 	TArray<AItemBase*> m_ItemList;
-
+	int m_CoinMax;
 };

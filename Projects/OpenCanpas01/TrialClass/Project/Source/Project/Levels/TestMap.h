@@ -8,7 +8,7 @@
 
 class AMagician;
 
-enum class PlayMapState : uint8
+enum class TestMapState : uint8
 {
 	PLAY,
 	PLAYER_DEAD,
@@ -39,7 +39,7 @@ private:
 	void Restart();
 
 private:
-	PlayMapState m_State;
+	TestMapState m_State;
 	AMagician* m_Player;
 	FTimerHandle m_TimerHandle;
 };

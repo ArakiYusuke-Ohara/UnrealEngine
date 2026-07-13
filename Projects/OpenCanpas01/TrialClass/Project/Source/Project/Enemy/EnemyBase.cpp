@@ -2,11 +2,14 @@
 
 
 #include "EnemyBase.h"
+#include "EnemyManager.h"
 #include "../Bullet/MagicianBullet.h"
 #include "../Magician/Magician.h"
+#include "../Levels/Play/PlayCounter.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "../Audio/AudioManager.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -15,7 +18,9 @@ AEnemyBase::AEnemyBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	m_IsDamage = false;
-	m_HitStopTime = 0.1f;
+	m_HitStopTime = 0.2f;
+	m_ShakeDir = 1.0f;
+	m_ShakePower = 10.0f;
 }
 
 // Called when the game starts or when spawned
@@ -28,6 +33,8 @@ void AEnemyBase::BeginPlay()
 	m_HP = m_MaxHP;
 	ACharacter* player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	m_Player = Cast<AMagician>(player);
+
+	GetWorld()->GetSubsystem<UEnemyManager>()->RegisterEnemy(this);
 }
 
 // Called every frame
@@ -85,6 +92,9 @@ void AEnemyBase::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp
 			// 吹っ飛ばしに使用するベクトル
 			m_LaunchVec = GetActorLocation() - otherActor->GetActorLocation();
 			m_LaunchVec.Normalize();
+
+			// バレット側のヒット処理
+			bullet->OnHit(this);
 		}
 	}
 }
@@ -116,8 +126,16 @@ void AEnemyBase::EndDamage()
 /// </summary>
 void AEnemyBase::StartHitStop()
 {
+	// ストップ
 	CustomTimeDilation = 0.05f;
+	// 指定時間後にヒットストップ終了関数が呼ばれるようにする
 	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::EndHitStop, m_HitStopTime, false);
+
+	// 振動処理
+	// 振動の中心座標
+	m_ShakeBaseLocation = GetMesh()->GetRelativeLocation();
+	// 振動処理を指定時間呼び続ける
+	GetWorld()->GetTimerManager().SetTimer(m_ShakeTimerHandle, this, &AEnemyBase::Shake, 1.0f / 60.0f, true);
 }
 
 /// <summary>
@@ -125,7 +143,11 @@ void AEnemyBase::StartHitStop()
 /// </summary>
 void AEnemyBase::EndHitStop()
 {
+	// 動き始める
 	CustomTimeDilation = 1.0f;
+
+	// 振動終了
+	GetWorld()->GetTimerManager().ClearTimer(m_ShakeTimerHandle);
 
 	// HPが0以下だったら死亡
 	if (m_HP <= 0)
@@ -199,11 +221,14 @@ void AEnemyBase::Dead()
 		vec.Z = 500.0f;
 	}
 
-	// 吹っ飛ばすにはCharacterMovementが必要なので確実に復活させる
+	// 歩行モードにしないと吹っ飛ばせない
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
 	// ③吹っ飛ばす
 
+
+	// 倒した敵数カウント
+	GetWorld()->GetSubsystem<UPlayCounter>()->AddKillEnemy();
 
 	// 一定時間後に終了、消滅
 	GetWorld()->GetTimerManager().SetTimer(m_TimerHandle, this, &AEnemyBase::Fin, 0.4f, false);
@@ -214,10 +239,18 @@ void AEnemyBase::Dead()
 /// </summary>
 void AEnemyBase::Fin()
 {
-	// 死亡エフェクト
+	// 死亡演出
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DeadEffect, GetActorLocation(), FRotator::ZeroRotator, GetActorScale());
+	UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+	audio->PlaySE(m_DeadSE, GetActorLocation());
 
 	// 非アクティブと非表示
 	m_IsActive = false;
 	SetVisible(false);
+}
+
+void AEnemyBase::Shake()
+{
+	GetMesh()->SetRelativeLocation(m_ShakeBaseLocation + FVector(m_ShakeDir * m_ShakePower, 0.0f, 0.0f));
+	m_ShakeDir *= -1;
 }

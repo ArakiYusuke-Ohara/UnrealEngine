@@ -6,10 +6,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "../Bullet/BulletManager.h"
 #include "../Bullet/MagicianBullet.h"
-#include "../GameInstance/MyGameInstance.h"
 #include "../Enemy/EnemyBase.h"
+#include "../Audio/AudioManager.h"
+#include "../Stage/Object/Goal.h"
 
 // Sets default values
 AMagician::AMagician()
@@ -21,6 +23,10 @@ AMagician::AMagician()
 	m_IsAttack = false;
 	m_IsDamage = false;
 	m_IsInvincible = false;
+	m_IsDead = false;
+	m_IsFallingDead = false;
+	m_IsGoal = false;
+	m_IsRetry = false;
 	m_InvisibleTime = 0.0f;
 }
 
@@ -53,8 +59,9 @@ void AMagician::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 落下死判定
-	if (m_IsDead == false && GetActorLocation().Z <= -1000.0f)
+	if (m_IsDead == false && GetActorLocation().Z <= -500.0f)
 	{
+		m_IsFallingDead = true;
 		StartDead();
 	}
 }
@@ -127,9 +134,20 @@ void AMagician::InputAttack(const FInputActionValue& value)
 /// <param name="value">入力値(bool)</param>
 void AMagician::InputJump(const FInputActionValue& value)
 {
-	if (!IsControll()) return;
+	// ゴールしてたらリトライ
+	if (m_IsGoal)
+	{
+		m_IsRetry = true;
+	}
+	else
+	{
+		if (!CanJump() || !IsControll()) return;
 
-	Jump();
+		Jump();
+
+		UAudioManager* audio = GetGameInstance()->GetSubsystem<UAudioManager>();
+		audio->PlaySE(m_JumpSE, GetActorLocation());
+	}
 }
 
 /// <summary>
@@ -140,8 +158,7 @@ void AMagician::FireBullet()
 {
 	if (m_Bullet)
 	{
-		UMyGameInstance* gameInstance = Cast<UMyGameInstance>(GetGameInstance());
-		UBulletManager* bulletManager = gameInstance->GetBulletManager();
+		UBulletManager* bulletManager = GetWorld()->GetSubsystem<UBulletManager>();
 		if (bulletManager)
 		{
 			// ②弾丸を発射する！！
@@ -219,6 +236,8 @@ void AMagician::HitDamageObject(AActor* otherActor, UPrimitiveComponent* otherCo
 /// </summary>
 void AMagician::Damage()
 {
+	m_IsAttack = false;
+
 	// ダメージエフェクト
 	if (m_DamageEffect)
 	{
@@ -324,7 +343,8 @@ void AMagician::StartDead()
 {
 	m_IsDead = true;
 	// 一定時間後に死亡終了処理
-	GetWorld()->GetTimerManager().SetTimer(m_DeadTimerHandle, this, &AMagician::EndDead, 2.0f, false);
+	float waitTime = m_IsFallingDead ? 0.1f : 2.0f;
+	GetWorld()->GetTimerManager().SetTimer(m_DeadTimerHandle, this, &AMagician::EndDead, waitTime, false);
 }
 
 /// <summary>
@@ -336,7 +356,7 @@ void AMagician::EndDead()
 	SetVisible(false);
 
 	// 死亡エフェクト
-	if (m_DeadEffect)
+	if (m_DeadEffect && !m_IsFallingDead)
 	{
 		if (GetMesh()->DoesSocketExist(FName("spine_02")))
 		{
@@ -351,8 +371,12 @@ void AMagician::EndDead()
 /// </summary>
 void AMagician::Respawn()
 {
-	// 死亡は解除する
+	// フラグ解除する
 	m_IsDead = false;
+	m_IsFallingDead = false;
+	m_IsGoal = false;
+	m_IsRetry = false;
+	m_IsAttack = false;
 
 	// HP再設定
 	m_HP = m_MaxHP;
@@ -403,6 +427,14 @@ void AMagician::BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp)
 		if (bullet->GetOwnerType() == EBulletOwner::Enemy)
 		{
 			HitDamageObject(otherActor, otherComp);
+			bullet->OnHit(this);
 		}
+	}
+	// ゴールに当たった
+	else if (otherActor->IsA(AGoal::StaticClass()))
+	{
+		APlayerController* controller = Cast<APlayerController>(GetController());
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
+		m_IsGoal = true;
 	}
 }

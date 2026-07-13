@@ -9,6 +9,7 @@
 #include "EnemyBase.generated.h"
 
 class AMagician;
+class UEnemyManager;
 
 UCLASS()
 class PROJECT_API AEnemyBase : public ACharacter
@@ -34,8 +35,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsDamage() const { return m_IsDamage; }
+
 	UFUNCTION(BlueprintCallable)
 	bool IsAttack() const { return m_IsAttack; }
+
 	bool IsActive() const { return m_IsActive; }
 	bool IsDead() const { return m_HP <= 0; }
 
@@ -63,6 +66,8 @@ private:
 	virtual void AttackB() {}
 	virtual void AttackC() {}
 
+	void Shake();
+
 protected:
 	bool m_IsActive;
 	bool m_IsStart;
@@ -79,6 +84,9 @@ protected:
 	UNiagaraSystem* m_DeadEffect;
 
 	UPROPERTY(EditAnywhere)
+	USoundBase* m_DeadSE;
+
+	UPROPERTY(EditAnywhere)
 	float m_StartDistance;
 
 	UPROPERTY(EditAnywhere)
@@ -89,4 +97,10 @@ protected:
 	FTimerHandle m_TimerHandle;
 	FVector m_LaunchVec;
 	FTransform m_RespawnTransform;
+
+private:
+	int m_ShakeDir;
+	FVector m_ShakeBaseLocation;
+	FTimerHandle m_ShakeTimerHandle;
+	float m_ShakePower;
 };

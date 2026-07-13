@@ -42,6 +42,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginOverlap(AActor* otherActor, UPrimitiveComponent* otherComp, const FHitResult& hit);
+	virtual void OnHit(AActor* hitActor);
 
 private:
 	void PlayHitEffect();
@@ -59,6 +60,16 @@ protected:
 	// Š—LÒ‚ğ¦‚·•Ï”
 	UPROPERTY(EditAnywhere)
 	EBulletOwner m_OwnerType;
+
+	// ”­Ë‰¹
+	UPROPERTY(EditAnywhere)
+	USoundBase* m_FireSE;
+	// –½’†‰¹
+	UPROPERTY(EditAnywhere)
+	USoundBase* m_HitSE;
+	// I—¹‰¹
+	UPROPERTY(EditAnywhere)
+	USoundBase* m_EndSE;
 
 	bool m_Active;
 	float m_NowLife;
